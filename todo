@@ -5,10 +5,11 @@ ls() {
 }
 
 did() {
-	$PAGER $HOME/todo/done.txt
+	$PAGER "$HOME/todo/done.txt"
 }
 
 add() {
+	# only provisional
 	$EDITOR "$HOME/todo/todo.txt"
 }
 
@@ -24,7 +25,8 @@ exit 0
 }
 
 case $1 in
-	ls) ls "$2" ;;
+	a*) add ;;
 	did) did ;;
+	l*) ls "$2" ;;
 	*) usage
 esac
