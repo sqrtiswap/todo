@@ -8,28 +8,19 @@ did() {
 	$PAGER ~/todo/done.txt
 }
 
-usage() { printf %s "\
-	todo 0.1 - simple todo list manager.
+usage() { printf %s "That option does not seem to exist. \
 
-	=> [a]dd [entry]	- Create a new entry.
-	=> ls | list		- List current todo list.
-	=> did			- Show already done items.
+todo 0.1 - simple todo list manager.
+
+=> [a]dd [entry]	- Create a new entry.
+=> ls | list		- List current todo list.
+=> did			- Show already done items.
+"
+exit 0
 }
 
 case $1 in
 	ls) ls "$2" ;;
 	did) did ;;
-	*) echo "That option does not seem to exist." && usage
+	*) usage
 esac
-
-#if [[ $1 = "ls" ]]; then
-	#ls
-#else
-	#echo "That option does not exist."
-#fi
-#
-#if [[ $1 = "did" ]]; then
-	#did
-#else
-	#echo "That option does not exist."
-#fi
