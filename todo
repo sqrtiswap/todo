@@ -1,5 +1,14 @@
 #!/bin/sh
 
+main() {
+	case $1 in
+		a*) add ;;
+		did) did ;;
+		l*) ls ;;
+		*) usage
+	esac
+}
+
 ls() {
 	sort -f < "$HOME/todo/todo.txt"
 }
@@ -24,9 +33,4 @@ todo 0.1 - simple todo list manager.
 exit 0
 }
 
-case $1 in
-	a*) add ;;
-	did) did ;;
-	l*) ls "$2" ;;
-	*) usage
-esac
+[ "$1" ] || usage && main "$@"
