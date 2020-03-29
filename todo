@@ -71,7 +71,7 @@ treeprj() {
 
 usage() { printf %s "That option does not seem to exist. \
 
-todo 0.1 - simple todo list manager.
+todo 0.2 - simple todo list manager.
 
 => [a]dd [entry]	- Create a new entry.
 => d[one] [entry]	- Mark [entry] as done.
