@@ -5,7 +5,11 @@ ls() {
 }
 
 did() {
-	$PAGER ~/todo/done.txt
+	$PAGER $HOME/todo/done.txt
+}
+
+add() {
+	$EDITOR "$HOME/todo/todo.txt"
 }
 
 usage() { printf %s "That option does not seem to exist. \
