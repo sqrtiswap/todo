@@ -39,15 +39,15 @@ ls() {
 }
 
 lscon() {
-	echo "Listing contexts with $2 is not yet implemented."
+	echo "Listing contexts with \$2 is not yet implemented."
 }
 
 lsprj() {
-	echo "Listing projects with $2 is not yet implemented."
+	echo "Listing projects with \$2 is not yet implemented."
 }
 
 prio() {
-	echo "Setting/Changing priorities with $2 and $3 is not yet implemented."
+	echo "Setting/Changing priorities with \$2 and \$3 is not yet implemented."
 }
 
 report() {
@@ -71,7 +71,7 @@ treeprj() {
 
 usage() { printf %s "That option does not seem to exist. \
 
-todo 0.2 - simple todo list manager.
+todo 0.2.1 - simple todo list manager.
 
 => [a]dd [entry]	- Create a new entry.
 => d[one] [entry]	- Mark [entry] as done.
