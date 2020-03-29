@@ -2,24 +2,71 @@
 
 main() {
 	case $1 in
-		a*) add ;;
-		did) did ;;
-		l*) ls ;;
+		a*) add ;;		# provisional
+		d*) didit ;;		# provisional
+		e*) edit ;;		# provisional
+		f*) finished ;;
+		l*) ls "$@" ;;
+		p*) prio ;;		# not implemented
+		r*) report ;;		# not implemented
+		t*) tree "$@" ;;	# not implemented
 		*) usage
 	esac
 }
 
-ls() {
-	sort -f < "$HOME/todo/todo.txt"
+add() {
+	$EDITOR "$HOME/todo/todo.txt"
 }
 
-did() {
+finished() {
 	$PAGER "$HOME/todo/done.txt"
 }
 
-add() {
-	# only provisional
+didit() {
+	$EDITOR $HOME/todo/todo.txt $HOME/todo/done.txt
+}
+
+edit() {
 	$EDITOR "$HOME/todo/todo.txt"
+}
+
+ls() {
+	case $2 in
+		c*) lscon ;;	# not implemented
+		p*) lsprj ;;	# not implemented
+		*) sort -f < "$HOME/todo/todo.txt"
+	esac
+}
+
+lscon() {
+	echo "Listing contexts with $2 is not yet implemented."
+}
+
+lsprj() {
+	echo "Listing projects with $2 is not yet implemented."
+}
+
+prio() {
+	echo "Setting/Changing priorities with $2 and $3 is not yet implemented."
+}
+
+report() {
+	echo "Creating reports is not yet implemented."
+}
+
+tree() {
+	case $2 in
+		c*) treecon ;;
+		p*) treeprj
+	esac
+}
+
+treecon() {
+	echo "Listing entries as a tree contexts > projects is not yet implemented."
+}
+
+treeprj() {
+	echo "Listing entries as a tree projects < contexts is not yet implemented."
 }
 
 usage() { printf %s "That option does not seem to exist. \
@@ -27,8 +74,27 @@ usage() { printf %s "That option does not seem to exist. \
 todo 0.1 - simple todo list manager.
 
 => [a]dd [entry]	- Create a new entry.
+=> d[one] [entry]	- Mark [entry] as done.
+=> e[dit] [entry]	- Edit [entry].
+=> f[inished]		- Show finished items.
 => ls | list		- List current todo list.
-=> did			- Show already done items.
+=> ls | list c[ontexts]	- List all contexts currently in use.
+=> ls | list p[rojects]	- List all projects currently active.
+=> p [entry] [priority]	- Set/Change priority of [entry] to [priority] (A-Z).
+=> r[eport]		- Create a report of the day containing the number of active and finished tasks.
+=> t[ree] c[ontexts]	- Show a tree of contexts > projects
+=> t[tee] p[rojects]	- Show a tree of projects > contexts
+=> h[help]		- Show this message.
+
+Used environment variables:
+EDITOR
+PAGER
+HOME
+
+todo expects your files to be in $HOME/todo/
+	todo.txt	- Current todo list containing active items
+	done.txt	- List of finished items
+	report.txt	- List of reports
 "
 exit 0
 }
