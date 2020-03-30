@@ -2,7 +2,7 @@
 
 main() {
 	case $1 in
-		a*) add ;;		# provisional
+		a*) add "$@" ;;		# provisional
 		d*) didit ;;		# provisional
 		e*) edit ;;		# provisional
 		f*) finished ;;
@@ -15,7 +15,7 @@ main() {
 }
 
 add() {
-	$EDITOR "$HOME/todo/todo.txt"
+	shift 1 && echo "$@" >> $HOME/todo/todo.txt
 }
 
 finished() {
@@ -71,7 +71,7 @@ treeprj() {
 
 usage() { printf %s "That option does not seem to exist. \
 
-todo 0.2.1 - simple todo list manager.
+todo 0.2.2 - simple todo list manager.
 
 => [a]dd [entry]	- Create a new entry.
 => d[one] [entry]	- Mark [entry] as done.
