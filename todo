@@ -6,7 +6,7 @@ main() {
 		d*) didit ;;		# provisional
 		e*) edit ;;		# provisional
 		f*) finished ;;
-		l*) ls "$@" ;;
+		l*) ls "$@" ;;		# not colored
 		p*) prio ;;		# not implemented
 		r*) report ;;		# not implemented
 		t*) tree "$@" ;;	# not implemented
@@ -15,7 +15,7 @@ main() {
 }
 
 add() {
-	shift 1 && echo "(Z) $(date +%Y-%m-%d) $@" >> $TODODIR/todo.txt
+	shift 1 && echo "(A) $(date +%Y-%m-%d) $@" >> $TODODIR/todo.txt
 }
 
 finished() {
@@ -32,8 +32,8 @@ edit() {
 
 ls() {
 	case $2 in
-		c*) lscon ;;	# not implemented
-		p*) lsprj ;;	# not implemented
+		c*) lscon ;;		# not implemented
+		p*) lsprj ;;		# not implemented
 		*) sort -f < "$TODODIR/todo.txt"
 	esac
 }
@@ -56,8 +56,8 @@ report() {
 
 tree() {
 	case $2 in
-		c*) treecon ;;
-		p*) treeprj
+		c*) treecon ;;		# not implemented
+		p*) treeprj		# not implemented
 	esac
 }
 
@@ -69,8 +69,8 @@ treeprj() {
 	echo "Listing entries as a tree projects < contexts is not yet implemented."
 }
 
-usage() { printf %s "That option does not seem to exist. \
-Take a look again at the usage instructions below or read the manpage of todo(1).
+usage() { echo "\\033[31mThat option does not seem to exist.
+Take a look again at the usage instructions below or read the manpage of todo(1).\\033[0m
 
 todo 0.2.3 - simple todo list manager.
 
@@ -93,7 +93,7 @@ Expected environment variables:
 => PAGER		- The pager you want to use, when taking a look at accomplished tasks.
 => TODODIR		- The directory where associated files are stored.
 
-todo expects your files to be in $TODODIR/
+todo expects your files to be in TODODIR/
 	todo.txt	- Current todo list containing active items
 	done.txt	- List of finished items
 	report.txt	- List of reports
