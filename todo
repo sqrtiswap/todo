@@ -2,7 +2,7 @@
 
 main() {
 	case $1 in
-		a*) add "$@" ;;		# provisional
+		a*) add "$@" ;;
 		d*) didit ;;		# provisional
 		e*) edit ;;		# provisional
 		f*) finished ;;
@@ -15,26 +15,26 @@ main() {
 }
 
 add() {
-	shift 1 && echo "$@" >> $HOME/todo/todo.txt
+	shift 1 && echo "(Z) $(date +%Y-%m-%d) $@" >> $TODODIR/todo.txt
 }
 
 finished() {
-	$PAGER "$HOME/todo/done.txt"
+	$PAGER "$TODODIR/done.txt"
 }
 
 didit() {
-	$EDITOR $HOME/todo/todo.txt $HOME/todo/done.txt
+	$EDITOR $TODODIR/todo.txt $TODODIR/done.txt
 }
 
 edit() {
-	$EDITOR "$HOME/todo/todo.txt"
+	$EDITOR "$TODODIR/todo.txt"
 }
 
 ls() {
 	case $2 in
 		c*) lscon ;;	# not implemented
 		p*) lsprj ;;	# not implemented
-		*) sort -f < "$HOME/todo/todo.txt"
+		*) sort -f < "$TODODIR/todo.txt"
 	esac
 }
 
@@ -86,12 +86,12 @@ todo 0.2.2 - simple todo list manager.
 => t[tee] p[rojects]	- Show a tree of projects > contexts
 => h[help]		- Show this message.
 
-Used environment variables:
-EDITOR
-PAGER
-HOME
+Expected environment variables:
+=> EDITOR		- The editor you want to use, when opening todo.txt
+=> PAGER		- The pager you want to use, when taking a look at accomplished tasks.
+=> TODODIR		- The directory where associated files are stored.
 
-todo expects your files to be in $HOME/todo/
+todo expects your files to be in $TODODIR/
 	todo.txt	- Current todo list containing active items
 	done.txt	- List of finished items
 	report.txt	- List of reports
