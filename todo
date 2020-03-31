@@ -70,6 +70,7 @@ treeprj() {
 }
 
 usage() { printf %s "That option does not seem to exist. \
+Take a look again at the usage instructions below or read the manpage of todo(1).
 
 todo 0.2.2 - simple todo list manager.
 
@@ -84,6 +85,7 @@ todo 0.2.2 - simple todo list manager.
 => r[eport]		- Create a report of the day containing the number of active and finished tasks.
 => t[ree] c[ontexts]	- Show a tree of contexts > projects
 => t[tee] p[rojects]	- Show a tree of projects > contexts
+
 => h[help]		- Show this message.
 
 Expected environment variables:
