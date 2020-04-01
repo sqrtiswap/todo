@@ -77,9 +77,9 @@ todo 0.3 - simple todo list manager.
 => d[one] [entry]	- Mark [entry] as done.
 => e[dit] [entry]	- Edit [entry].
 => f[inished]		- Show finished items.
-=> ls | list		- List current todo list.
-=> ls | list c[ontexts]	- List all contexts currently in use.
-=> ls | list p[rojects]	- List all projects currently active.
+=> ls			- List current todo list.
+=> lscon		- List all contexts currently in use.
+=> lsprj		- List all projects currently active.
 => p [entry] [priority]	- Set/Change priority of [entry] to [priority] (A-Z).
 => r[eport]		- Create a report of the day containing the number of active and finished tasks.
 => t[ree] c[ontexts]	- Show a tree of contexts > projects
