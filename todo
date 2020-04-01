@@ -6,16 +6,18 @@ main() {
 		d*) didit ;;		# provisional
 		e*) edit ;;		# provisional
 		f*) finished ;;
-		l*) ls "$@" ;;		# not colored
-		p*) prio ;;		# not implemented
-		r*) report ;;		# not implemented
+		ls) ls "$@" ;;
+		lscon) lscon ;;		# not implemented
+		lsprj) lsprj ;;		# not implemented
+		p*) prio "$@" ;;
+		r*) report ;;
 		t*) tree "$@" ;;	# not implemented
 		*) usage
 	esac
 }
 
 add() {
-	shift 1 && echo "(A) $(date +%Y-%m-%d) $@" >> $TODODIR/todo.txt
+	shift 1 && echo "(A) $(date +%F) $@" >> $TODODIR/todo.txt
 }
 
 finished() {
@@ -31,11 +33,8 @@ edit() {
 }
 
 ls() {
-	case $2 in
-		c*) lscon ;;		# not implemented
-		p*) lsprj ;;		# not implemented
-		*) sort -f < "$TODODIR/todo.txt"
-	esac
+	#awk -v pat="$2" '$0 ~ pat {printf "%4s %s\n", NR, $0}' "$TODODIR/todo.txt" | sort -k2 | awk '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;32m"}/\(C\)/{cs="\033[1;33m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{print cs$0ce}'
+	awk -v pat="$2" 'index($0, pat){printf "%4s %s\n", NR, $0}' "$TODODIR/todo.txt" | sort -k2 | awk '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;32m"}/\(C\)/{cs="\033[1;33m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{print cs$0ce}'
 }
 
 lscon() {
@@ -47,11 +46,11 @@ lsprj() {
 }
 
 prio() {
-	echo "Setting/Changing priorities with \$2 and \$3 is not yet implemented."
+	sed -i "$2"'s/(.)/('"$3"')/' "$TODODIR/todo.txt" && awk -v pat="$2" '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;32m"}/\(C\)/{cs="\033[1;33m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{if(NR==pat)print cs $0 ce}' "$TODODIR/todo.txt"
 }
 
 report() {
-	echo "Creating reports is not yet implemented."
+	echo "$(date +%FT%TZ) $(awk 'END{print NR}' $TODODIR/todo.txt) $(awk 'END{print NR}' $TODODIR/done.txt)" >> "$TODODIR/report.txt"
 }
 
 tree() {
@@ -96,9 +95,7 @@ Expected environment variables:
 todo expects your files to be in TODODIR/
 	todo.txt	- Current todo list containing active items
 	done.txt	- List of finished items
-	report.txt	- List of reports
-"
-exit 0
+	report.txt	- List of reports"
 }
 
 [ "$1" ] || usage && main "$@"
