@@ -12,7 +12,9 @@ main() {
 		p*) prio "$@" ;;
 		r*) report ;;
 		t*) tree "$@" ;;	# not implemented
-		*) usage
+		h*) usage ;;
+		u*) usage ;;
+		*)
 	esac
 }
 
@@ -46,7 +48,7 @@ lsprj() {
 }
 
 prio() {
-	sed -i "$2"'s/(.)/('"$3"')/' "$TODODIR/todo.txt" && awk -v pat="$2" '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;32m"}/\(C\)/{cs="\033[1;33m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{if(NR==pat)print cs $0 ce}' "$TODODIR/todo.txt"
+	[ "$2" != '' ] && [ "$3" != '' ] && sed -i "$2"'s/(.)/('"$3"')/' "$TODODIR/todo.txt" && awk -v pat="$2" '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;32m"}/\(C\)/{cs="\033[1;33m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{if(NR==pat)print cs $0 ce}' "$TODODIR/todo.txt"
 }
 
 report() {
@@ -71,7 +73,7 @@ treeprj() {
 usage() { echo "\\033[31mThat option does not seem to exist.
 Take a look again at the usage instructions below or read the manpage of todo(1).\\033[0m
 
-todo 0.3.1 - simple todo list manager.
+todo 0.4 - simple todo list manager.
 
 => [a]dd [entry]	- Create a new entry.
 => d[one] [entry]	- Mark [entry] as done.
