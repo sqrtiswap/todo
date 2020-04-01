@@ -13,7 +13,6 @@ main() {
 		r*) report ;;
 		t*) tree "$@" ;;	# not implemented
 		h*) usage ;;
-		u*) usage ;;
 		*)
 	esac
 }
@@ -70,10 +69,7 @@ treeprj() {
 	echo "Listing entries as a tree projects < contexts is not yet implemented."
 }
 
-usage() { echo "\\033[31mThat option does not seem to exist.
-Take a look again at the usage instructions below or read the manpage of todo(1).\\033[0m
-
-todo 0.4 - simple todo list manager.
+usage() { printf "todo(1) version 0.4 - simple todo list manager.
 
 => [a]dd [entry]	- Create a new entry.
 => d[one] [entry]	- Mark [entry] as done.
@@ -88,6 +84,7 @@ todo 0.4 - simple todo list manager.
 => t[tee] p[rojects]	- Show a tree of projects > contexts
 
 => h[help]		- Show this message.
+Alternatively read the manpage.
 
 Expected environment variables:
 => EDITOR		- The editor you want to use, when opening todo.txt
@@ -97,7 +94,9 @@ Expected environment variables:
 todo expects your files to be in TODODIR/
 	todo.txt	- Current todo list containing active items
 	done.txt	- List of finished items
-	report.txt	- List of reports"
+	report.txt	- List of reports
+"
+exit 0
 }
 
 [ "$1" ] || usage && main "$@"
