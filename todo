@@ -4,7 +4,7 @@ main() {
 	case $1 in
 		a*) add "$@" ;;
 		d*) didit ;;		# provisional
-		e*) edit ;;		# provisional
+		e*) edit "$@" ;;	# subfunctions not done yet
 		f*) finished ;;
 		ls) ls "$@" ;;
 		lscon) lscon ;;		# not implemented
@@ -21,6 +21,10 @@ add() {
 	shift 1 && echo "(A) $(date +%F)" "$@" >> "$TODODIR/todo.txt"
 }
 
+append() {
+	echo "Appending with \$@ is not yet implemented."
+}
+
 finished() {
 	$PAGER "$TODODIR/done.txt"
 }
@@ -30,7 +34,11 @@ didit() {
 }
 
 edit() {
-	$EDITOR "$TODODIR/todo.txt"
+	case $2 in
+		p*) prepend "$@" ;;	# not implemented
+		a*) append "$@" ;;	# not implemented
+		*) $EDITOR "$TODODIR/todo.txt"
+	esac
 }
 
 ls() {
@@ -44,6 +52,10 @@ lscon() {
 
 lsprj() {
 	echo "Listing projects with \$2 is not yet implemented."
+}
+
+prepend() {
+	echo "Prepending with \$@ is not yet implemented."
 }
 
 prio() {
