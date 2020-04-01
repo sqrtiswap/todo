@@ -71,7 +71,7 @@ treeprj() {
 usage() { echo "\\033[31mThat option does not seem to exist.
 Take a look again at the usage instructions below or read the manpage of todo(1).\\033[0m
 
-todo 0.2.3 - simple todo list manager.
+todo 0.3 - simple todo list manager.
 
 => [a]dd [entry]	- Create a new entry.
 => d[one] [entry]	- Mark [entry] as done.
