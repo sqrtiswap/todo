@@ -58,14 +58,14 @@ prepend() {
 }
 
 prio() {
-	[ "$2" != '' ] && [ "$3" != '' ] && sed -i "$2"'s/(.)/('"$3"')/' "$TODODIR/todo.txt" && awk -v pat="$2" '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;32m"}/\(C\)/{cs="\033[1;33m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{if(NR==pat)print cs $0 ce}' "$TODODIR/todo.txt"
+	[ "$2" != '' ] && [ "$3" != '' ] && sed -i "$2"'s/(.)/('"$3"')/' "$TODODIR/todo.txt" && awk -v pat="$2" '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;33m"}/\(C\)/{cs="\033[1;32m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{if(NR==pat)print cs $0 ce}' "$TODODIR/todo.txt"
 }
 
 report() {
 	echo "$(date +%FT%TZ) $(awk 'END{print NR}' "$TODODIR/todo.txt") $(awk 'END{print NR}' "$TODODIR/done.txt")" >> "$TODODIR/report.txt"
 }
 
-usage() { printf "todo(1) version 0.4p1 - simple todo list manager.
+usage() { printf "todo(1) version 0.4p2 - simple todo list manager.
 
 => [a]dd [entry]	- Create a new entry.
 => d[one] [entry]	- Mark [entry] as done.
