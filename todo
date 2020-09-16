@@ -11,7 +11,6 @@ main() {
 		lsprj) lsprj ;;		# not implemented
 		p*) prio "$@" ;;
 		r*) report ;;
-		t*) tree "$@" ;;	# not implemented
 		h*) usage ;;
 		*)
 	esac
@@ -66,22 +65,7 @@ report() {
 	echo "$(date +%FT%TZ) $(awk 'END{print NR}' "$TODODIR/todo.txt") $(awk 'END{print NR}' "$TODODIR/done.txt")" >> "$TODODIR/report.txt"
 }
 
-tree() {
-	case $2 in
-		c*) treecon ;;		# not implemented
-		p*) treeprj		# not implemented
-	esac
-}
-
-treecon() {
-	echo "Listing entries as a tree contexts > projects is not yet implemented."
-}
-
-treeprj() {
-	echo "Listing entries as a tree projects < contexts is not yet implemented."
-}
-
-usage() { printf "todo(1) version 0.4p0 - simple todo list manager.
+usage() { printf "todo(1) version 0.4p1 - simple todo list manager.
 
 => [a]dd [entry]	- Create a new entry.
 => d[one] [entry]	- Mark [entry] as done.
@@ -92,8 +76,6 @@ usage() { printf "todo(1) version 0.4p0 - simple todo list manager.
 => lsprj		- List all projects currently active.
 => p [entry] [priority]	- Set/Change priority of [entry] to [priority] (A-Z).
 => r[eport]		- Create a report of the day containing the number of active and finished tasks.
-=> t[ree] c[ontexts]	- Show a tree of contexts > projects
-=> t[tee] p[rojects]	- Show a tree of projects > contexts
 
 => h[help]		- Show this message.
 Alternatively read the manpage.
