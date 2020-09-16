@@ -43,7 +43,7 @@ edit() {
 
 ls() {
 	#awk -v pat="$2" '$0 ~ pat {printf "%4s %s\n", NR, $0}' "$TODODIR/todo.txt" | sort -k2 | awk '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;32m"}/\(C\)/{cs="\033[1;33m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{print cs$0ce}'
-	awk -v pat="$2" 'index($0, pat){printf "%4s %s\n", NR, $0}' "$TODODIR/todo.txt" | sort -k2 | awk '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;32m"}/\(C\)/{cs="\033[1;33m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{print cs$0ce}'
+	awk -v pat="$2" 'index($0, pat){printf "%4s %s\n", NR, $0}' "$TODODIR/todo.txt" | sort -k2 | awk '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;33m"}/\(C\)/{cs="\033[1;32m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{print cs$0ce}'
 }
 
 lscon() {
@@ -81,7 +81,7 @@ treeprj() {
 	echo "Listing entries as a tree projects < contexts is not yet implemented."
 }
 
-usage() { printf "todo(1) version 0.4 - simple todo list manager.
+usage() { printf "todo(1) version 0.4p0 - simple todo list manager.
 
 => [a]dd [entry]	- Create a new entry.
 => d[one] [entry]	- Mark [entry] as done.
