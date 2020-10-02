@@ -7,8 +7,8 @@ main() {
 		e*) edit "$@" ;;	# subfunctions not done yet
 		f*) finished ;;
 		ls) ls "$@" ;;
-		lscon) lscon ;;		# not implemented
-		lsprj) lsprj ;;		# not implemented
+		lc) lscon ;;
+		lp) lsprj ;;
 		p*) prio "$@" ;;
 		r*) report ;;
 		h*) usage ;;
@@ -54,11 +54,11 @@ ls() {
 #}
 
 lscon() {
-	echo "Listing contexts with \$2 is not yet implemented."
+	grep -oh '[[:alnum:]]*+[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u
 }
 
 lsprj() {
-	echo "Listing projects with \$2 is not yet implemented."
+	grep -oh '[[:alnum:]]*@[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u
 }
 
 prepend() {
@@ -75,13 +75,13 @@ report() {
 
 usage() { printf "todo(1) version 0.4p2 - simple todo list manager.
 
-=> [a]dd [entry]	- Create a new entry.
+=> a[dd] [entry]	- Create a new entry.
 => d[one] [entry]	- Mark [entry] as done.
 => e[dit] [entry]	- Edit [entry].
 => f[inished]		- Show finished items.
 => ls			- List current todo list.
-=> lscon		- List all contexts currently in use.
-=> lsprj		- List all projects currently active.
+=> lc			- List all contexts currently in use.
+=> lp			- List all projects currently active.
 => p [entry] [priority]	- Set/Change priority of [entry] to [priority] (A-Z).
 => r[eport]		- Create a report of the day containing the number of active and finished tasks.
 
