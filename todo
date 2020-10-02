@@ -4,7 +4,7 @@ main() {
 	case $1 in
 		a*) add "$@" ;;
 		d*) didit "$@" ;;
-		e*) edit "$@" ;;	# subfunctions not done yet
+		e*) edit "$@" ;;
 		f*) finished ;;
 		ls) ls "$@" ;;
 		lc) lscon ;;
@@ -21,7 +21,7 @@ add() {
 }
 
 append() {
-	echo "Appending with \$@ is not yet implemented."
+	[ "$3" != '' ] && [ "$4" != '' ] && sed -i "$3"'s/$/ '"$4"'/' "$TODODIR/todo.txt" && awk -v pat="$3" '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;33m"}/\(C\)/{cs="\033[1;32m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{if(NR==pat)print cs $0 ce}' "$TODODIR/todo.txt"
 }
 
 finished() {
@@ -35,8 +35,7 @@ didit() {
 
 edit() {
 	case $2 in
-		p*) prepend "$@" ;;	# not implemented
-		a*) append "$@" ;;	# not implemented
+		a*) append "$@" ;;
 		*) $EDITOR "$TODODIR/todo.txt"
 	esac
 }
@@ -55,14 +54,11 @@ ls() {
 
 lscon() {
 	grep -oh '[[:alnum:]]*+[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u
+	# change the + if you want your regexps to succeed
 }
 
 lsprj() {
 	grep -oh '[[:alnum:]]*@[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u
-}
-
-prepend() {
-	echo "Prepending with \$@ is not yet implemented."
 }
 
 prio() {
@@ -73,19 +69,20 @@ report() {
 	echo "$(date +%FT%TZ) $(awk 'END{print NR}' "$TODODIR/todo.txt") $(awk 'END{print NR}' "$TODODIR/done.txt")" >> "$TODODIR/report.txt"
 }
 
-usage() { printf "todo(1) version 0.4p2 - simple todo list manager.
+usage() { printf "todo(1) version 0.5 - simple todo list manager.
 
-=> a[dd] [entry]	- Create a new entry.
-=> d[one] [entry]	- Mark [entry] as done.
-=> e[dit] [entry]	- Edit [entry].
-=> f[inished]		- Show finished items.
-=> ls			- List current todo list.
-=> lc			- List all contexts currently in use.
-=> lp			- List all projects currently active.
-=> p [entry] [priority]	- Set/Change priority of [entry] to [priority] (A-Z).
-=> r[eport]		- Create a report of the day containing the number of active and finished tasks.
+=> a[dd] [entry]			- Create a new entry.
+=> d[one] [entry]			- Mark [entry] as done.
+=> e[dit] [entry]			- Edit [entry] in your EDITOR.
+=> e[dit] a[ppend] [entry] [text]	- Appends [text] to [entry].
+=> f[inished]				- Show finished items.
+=> ls					- List current todo list.
+=> lc					- List all contexts currently in use.
+=> lp					- List all projects currently active.
+=> p [entry] [priority]			- Set/Change priority of [entry] to [priority] (A-Z).
+=> r[eport]				- Create a report of the day containing the number of active and finished tasks.
 
-=> h[help]		- Show this message.
+=> h[help]				- Show this message.
 Alternatively read the manpage.
 
 Expected environment variables:
@@ -97,6 +94,8 @@ todo expects your files to be in TODODIR/
 	todo.txt	- Current todo list containing active items
 	done.txt	- List of finished items
 	report.txt	- List of reports
+
+The syntax of todo.txt, specifically the + identifier for projects conflicts with regular expressions in awk. If you want to do manipulate the output later on, you're gonna have to tweak some of the functions a little - I included some guiding comments.
 "
 exit 0
 }
