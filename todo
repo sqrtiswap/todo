@@ -3,7 +3,7 @@
 main() {
 	case $1 in
 		a*) add "$@" ;;
-		d*) didit ;;		# provisional
+		d*) didit "$@" ;;
 		e*) edit "$@" ;;	# subfunctions not done yet
 		f*) finished ;;
 		ls) ls "$@" ;;
@@ -29,7 +29,8 @@ finished() {
 }
 
 didit() {
-	$EDITOR "$TODODIR/todo.txt" "$TODODIR/done.txt"
+	pat="$2"
+	echo "x $(date +%F)" "$(sed -e 's/(.) //g;'"${pat}"'q;d' "$TODODIR/todo.txt")" >> "$TODODIR/done.txt" && sed -i "${pat}d" "$TODODIR/todo.txt" && tail -1 "$TODODIR/done.txt"
 }
 
 edit() {
@@ -41,9 +42,16 @@ edit() {
 }
 
 ls() {
-	#awk -v pat="$2" '$0 ~ pat {printf "%4s %s\n", NR, $0}' "$TODODIR/todo.txt" | sort -k2 | awk '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;32m"}/\(C\)/{cs="\033[1;33m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{print cs$0ce}'
 	awk -v pat="$2" 'index($0, pat){printf "%4s %s\n", NR, $0}' "$TODODIR/todo.txt" | sort -k2 | awk '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;33m"}/\(C\)/{cs="\033[1;32m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{print cs$0ce}'
 }
+
+# Regular expressions conflict with the identifier + for projects. The above version of ls() fixes this inside of todo(1). But if you want to manipulate the output later with regexp you're gonna run into problems. The following version of ls() is a standard implementation, meaning:
+# 1) todo(1) with this second ls() will break when using + as an identifier for projects. USE A DIFFERENT IDENTIFIER.
+# 2) When using a different identifier and this second version of ls(), you can manipulate your output with regexp all day long.
+
+#ls() {
+	#awk -v pat="$2" '$0 ~ pat {printf "%4s %s\n", NR, $0}' "$TODODIR/todo.txt" | sort -k2 | awk '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;32m"}/\(C\)/{cs="\033[1;33m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{print cs$0ce}'
+#}
 
 lscon() {
 	echo "Listing contexts with \$2 is not yet implemented."
