@@ -30,7 +30,9 @@ finished() {
 
 didit() {
 	pat="$2"
-	echo "x $(date +%F)" "$(sed -e 's/(.) //g;'"${pat}"'q;d' "$TODODIR/todo.txt")" >> "$TODODIR/done.txt" && sed -i "${pat}d" "$TODODIR/todo.txt" && tail -1 "$TODODIR/done.txt"
+	echo "x $(date +%F)" "$(sed -n "${pat}p" "$TODODIR/todo.txt")" >> "$TODODIR/done.txt" && sed -i "${pat}d" "$TODODIR/todo.txt" && tail -1 "$TODODIR/done.txt"
+	# different version that removes the priority of the finished task:
+	#echo "x $(date +%F)" "$(sed -e 's/(.) //g;'"${pat}"'q;d' "$TODODIR/todo.txt")" >> "$TODODIR/done.txt" && sed -i "${pat}d" "$TODODIR/todo.txt" && tail -1 "$TODODIR/done.txt"
 }
 
 edit() {
@@ -95,7 +97,7 @@ todo expects your files to be in TODODIR/
 	done.txt	- List of finished items
 	report.txt	- List of reports
 
-The syntax of todo.txt, specifically the + identifier for projects conflicts with regular expressions in awk. If you want to do manipulate the output later on, you're gonna have to tweak some of the functions a little - I included some guiding comments.
+The syntax of todo.txt, specifically the + identifier for projects conflicts with regular expressions in awk. If you want to manipulate the output later on, you're gonna have to tweak some of the functions a little - I included some guiding comments.
 "
 exit 0
 }
