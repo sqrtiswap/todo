@@ -69,7 +69,7 @@ prio() {
 }
 
 report() {
-	echo "$(date +%FT%TZ) $(awk 'END{print NR}' "$TODODIR/todo.txt") $(awk 'END{print NR}' "$TODODIR/done.txt")" >> "$TODODIR/report.txt"
+	echo "$(date +%FT%TZ) $(awk 'END{print NR}' "$TODODIR/todo.txt") $(awk 'END{print NR}' "$TODODIR/done.txt")" >> "$TODODIR/report.txt" && tail -1 "$TODODIR/report.txt"
 }
 
 usage() { printf "todo(1) version 0.6 - simple todo list manager.
