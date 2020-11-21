@@ -56,12 +56,12 @@ ls() {
 #}
 
 lscon() {
-	grep -oh '[[:alnum:]]*+[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u
-	# change the + if you want your regexps to succeed
+	grep -oh '[[:alnum:]]*@[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u
 }
 
 lsprj() {
-	grep -oh '[[:alnum:]]*@[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u
+	grep -oh '[[:alnum:]]*+[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u
+	# change the + if you want your regexps to succeed
 }
 
 prio() {
@@ -72,7 +72,7 @@ report() {
 	echo "$(date +%FT%TZ) $(awk 'END{print NR}' "$TODODIR/todo.txt") $(awk 'END{print NR}' "$TODODIR/done.txt")" >> "$TODODIR/report.txt" && tail -1 "$TODODIR/report.txt"
 }
 
-usage() { printf "todo(1) version 0.6 - simple todo list manager.
+usage() { printf "todo(1) version 0.6p0 - simple todo list manager.
 
 => a[dd] [entry]			- Create a new entry.
 => d[one] [entry]			- Mark [entry] as done.
