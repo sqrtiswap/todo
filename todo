@@ -30,10 +30,9 @@ finished() {
 }
 
 didit() {
-	pat="$2"
-	echo "x $(date +%F)" "$(sed -n "${pat}p" "$TODODIR/todo.txt")" >> "$TODODIR/done.txt" && sed -i "${pat}d" "$TODODIR/todo.txt" && tail -1 "$TODODIR/done.txt"
+	[ "$2" != '' ] && pat="$2" && echo "x $(date +%F)" "$(sed -n "${pat}p" "$TODODIR/todo.txt")" >> "$TODODIR/done.txt" && sed -i "${pat}d" "$TODODIR/todo.txt" && tail -1 "$TODODIR/done.txt"
 	# different version that removes the priority of the finished task:
-	#echo "x $(date +%F)" "$(sed -e 's/(.) //g;'"${pat}"'q;d' "$TODODIR/todo.txt")" >> "$TODODIR/done.txt" && sed -i "${pat}d" "$TODODIR/todo.txt" && tail -1 "$TODODIR/done.txt"
+	#[ "$2" != '' ] && pat="$2" && echo "x $(date +%F)" "$(sed -e 's/(.) //g;'"${pat}"'q;d' "$TODODIR/todo.txt")" >> "$TODODIR/done.txt" && sed -i "${pat}d" "$TODODIR/todo.txt" && tail -1 "$TODODIR/done.txt"
 }
 
 edit() {
@@ -72,7 +71,7 @@ report() {
 	echo "$(date +%FT%TZ) $(awk 'END{print NR}' "$TODODIR/todo.txt") $(awk 'END{print NR}' "$TODODIR/done.txt")" >> "$TODODIR/report.txt" && tail -1 "$TODODIR/report.txt"
 }
 
-usage() { printf "todo(1) version 0.6p0 - simple todo list manager.
+usage() { printf "todo(1) version 0.6p1 - simple todo list manager.
 
 => a[dd] [entry]			- Create a new entry.
 => d[one] [entry]			- Mark [entry] as done.
