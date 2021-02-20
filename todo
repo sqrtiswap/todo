@@ -42,17 +42,18 @@ edit() {
 	esac
 }
 
-ls() {
-	awk -v pat="$2" 'index($0, pat){printf "%4s %s\n", NR, $0}' "$TODODIR/todo.txt" | sort -k2 | awk '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;33m"}/\(C\)/{cs="\033[1;32m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{print cs$0ce}'
-}
+#ls() {
+	#awk -v pat="$2" 'index($0, pat){printf "%4s %s\n", NR, $0}' "$TODODIR/todo.txt" | sort -k2 | awk '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;33m"}/\(C\)/{cs="\033[1;32m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{print cs$0ce}'
+#}
 
 # Regular expressions conflict with the identifier + for projects. The above version of ls() fixes this inside of todo(1). But if you want to manipulate the output later with regexp you're gonna run into problems. The following version of ls() is a standard implementation, meaning:
 # 1) todo(1) with this second ls() will break when using + as an identifier for projects. USE A DIFFERENT IDENTIFIER.
+	# This version does not currently support case insensitive matching.
 # 2) When using a different identifier and this second version of ls(), you can manipulate your output with regexp all day long.
 
-#ls() {
-	#awk -v pat="$2" '$0 ~ pat {printf "%4s %s\n", NR, $0}' "$TODODIR/todo.txt" | sort -k2 | awk '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;32m"}/\(C\)/{cs="\033[1;33m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{print cs$0ce}'
-#}
+ls() {
+	awk -v pat="$2" 'tolower($0) ~ pat {printf "%4s %s\n", NR, $0}' "$TODODIR/todo.txt" | sort -k2 | awk '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;32m"}/\(C\)/{cs="\033[1;33m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{print cs$0ce}'
+}
 
 lscon() {
 	grep -oh '[[:alnum:]]*@[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u
@@ -71,14 +72,14 @@ report() {
 	echo "$(date +%FT%TZ) $(awk 'END{print NR}' "$TODODIR/todo.txt") $(awk 'END{print NR}' "$TODODIR/done.txt")" >> "$TODODIR/report.txt" && tail -1 "$TODODIR/report.txt"
 }
 
-usage() { printf "todo(1) version 0.6p1 - simple todo list manager.
+usage() { printf "todo(1) version 0.7 - simple todo list manager.
 
 => a[dd] [entry]			- Create a new entry.
 => d[one] [entry]			- Mark [entry] as done.
 => e[dit] [entry]			- Edit [entry] in your EDITOR.
 => e[dit] a[ppend] [entry] [text]	- Appends [text] to [entry].
 => f[inished]				- Show finished items.
-=> ls					- List current todo list.
+=> ls					- List current todo list. This works in a case-insensitive manner.
 => lc					- List all contexts currently in use.
 => lp					- List all projects currently active.
 => p [entry] [priority]			- Set/Change priority of [entry] to [priority] (A-Z).
