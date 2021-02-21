@@ -11,6 +11,7 @@ main() {
 		lp) lsprj ;;
 		p*) prio "$@" ;;
 		r*) report ;;
+		t*) today ;;
 		h*) usage ;;
 		*)
 	esac
@@ -73,6 +74,13 @@ report() {
 	echo "$(date +%FT%TZ) $(awk 'END{print NR}' "$TODODIR/todo.txt") $(awk 'END{print NR}' "$TODODIR/done.txt")" >> "$TODODIR/report.txt" && tail -1 "$TODODIR/report.txt"
 }
 
+today() {
+	echo "----- due:today -----"
+	todo ls due:"$(date +%Y-%m-%d)"
+	echo "----- _urgent -------"
+	todo ls _urgent
+}
+
 usage() { printf "todo(1) version 0.7p0 - simple todo list manager.
 
 => a[dd] [entry]			- Create a new entry.
@@ -85,6 +93,7 @@ usage() { printf "todo(1) version 0.7p0 - simple todo list manager.
 => lp					- List all projects currently active.
 => p [entry] [priority]			- Set/Change priority of [entry] to [priority] (A-Z).
 => r[eport]				- Create a report of the day containing the number of active and finished tasks.
+=> t[oday]				- List all tasks due today and also those marked _urgent.
 
 => h[help]				- Show this message.
 Alternatively read the manpage.
