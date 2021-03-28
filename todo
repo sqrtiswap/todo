@@ -81,7 +81,7 @@ today() {
 	todo ls _urgent
 }
 
-usage() { printf "todo(1) version 0.8p0 - simple todo list manager.
+usage() { printf "todo(1) version 0.8p1 - simple todo list manager.
 
 => a[dd] [entry]			- Create a new entry.
 => d[one] [entry]			- Mark [entry] as done.
