@@ -68,7 +68,7 @@ today() {
 	elif [ "$DUETODAY" = 0 ] && [ "$DUEURGENT" != 0 ] ; then
 		echo "---> Nothing due today, $(date '+%e %B %Y')"
 		echo "---> Due urgently/overdue"
-		list_tasks "" " _urgent"
+		list_tasks "" "_urgent"
 	else
 		echo "Nothing due! ;)"
 	fi
