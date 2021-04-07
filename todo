@@ -80,21 +80,21 @@ today() {
 	echo "todo: Current tasks"
 	if [ "$DUETODAY" != 0 ] ; then
 		echo "---> Due today, $(date '+%e %B %Y')"
-		todo ls due:"$(date +%Y-%m-%d)"
+		ls "" "due:$(date +%F)"
 		if [ "$DUEURGENT" != 0 ] ; then
 			echo "---> Due urgently/overdue"
-			todo ls _urgent
+			ls "" "_urgent"
 		fi
 	elif [ "$DUETODAY" = 0 ] && [ "$DUEURGENT" != 0 ] ; then
 		echo "---> Nothing due today, $(date '+%e %B %Y')"
 		echo "---> Due urgently/overdue"
-		todo ls _urgent
+		ls "" " _urgent"
 	else
 		echo "Nothing due! ;)"
 	fi
 }
 
-usage() { printf "todo(1) version 0.8p1 - simple todo list manager.
+usage() { printf "todo(1) version 0.8.1 - simple todo list manager.
 
 => a[dd] [entry]			- Create a new entry.
 => d[one] [entry]			- Mark [entry] as done.
