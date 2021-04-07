@@ -75,10 +75,23 @@ report() {
 }
 
 today() {
-	echo "----- due:today -----"
-	todo ls due:"$(date +%Y-%m-%d)"
-	echo "----- _urgent -------"
-	todo ls _urgent
+	DUETODAY=$(grep -c "$(date +%F)" "$TODODIR"/todo.txt)
+	DUEURGENT=$(grep -c _urgent "$TODODIR"/todo.txt)
+	echo "todo: Current tasks"
+	if [ "$DUETODAY" != 0 ] ; then
+		echo "---> Due today, $(date '+%e %B %Y')"
+		todo ls due:"$(date +%Y-%m-%d)"
+		if [ "$DUEURGENT" != 0 ] ; then
+			echo "---> Due urgently/overdue"
+			todo ls _urgent
+		fi
+	elif [ "$DUETODAY" = 0 ] && [ "$DUEURGENT" != 0 ] ; then
+		echo "---> Nothing due today, $(date '+%e %B %Y')"
+		echo "---> Due urgently/overdue"
+		todo ls _urgent
+	else
+		echo "Nothing due! ;)"
+	fi
 }
 
 usage() { printf "todo(1) version 0.8p1 - simple todo list manager.
