@@ -1,23 +1,6 @@
 #!/bin/sh
 
-main() {
-	case $1 in
-		a*) add "$@" ;;
-		d*) didit "$@" ;;
-		e*) edit "$@" ;;
-		f*) finished ;;
-		ls) ls "$@" ;;
-		lc) lscon ;;
-		lp) lsprj ;;
-		p*) prio "$@" ;;
-		r*) report ;;
-		t*) today ;;
-		h*) usage ;;
-		*)
-	esac
-}
-
-add() {
+create_task() {
 	shift 1 && echo "(A) $(date +%F)" "$@" >> "$TODODIR/todo.txt"
 	awk '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;33m"}/\(C\)/{cs="\033[1;32m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}END{printf "%4s %s\n", cs NR ce, cs $0 ce}' "$TODODIR/todo.txt"
 }
@@ -26,47 +9,44 @@ append() {
 	[ "$3" != '' ] && [ "$4" != '' ] && sed -i "$3"'s/$/ '"$4"'/' "$TODODIR/todo.txt" && awk -v pat="$3" '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;33m"}/\(C\)/{cs="\033[1;32m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{if(NR==pat)print cs $0 ce}' "$TODODIR/todo.txt"
 }
 
-finished() {
+list_finished() {
 	$PAGER "$TODODIR/done.txt"
 }
 
-didit() {
+mark_done() {
 	[ "$2" != '' ] && pat="$2" && echo "x $(date +%F)" "$(sed -n "${pat}p" "$TODODIR/todo.txt")" >> "$TODODIR/done.txt" && sed -i "${pat}d" "$TODODIR/todo.txt" && tail -1 "$TODODIR/done.txt"
 	# different version that removes the priority of the finished task:
 	#[ "$2" != '' ] && pat="$2" && echo "x $(date +%F)" "$(sed -e 's/(.) //g;'"${pat}"'q;d' "$TODODIR/todo.txt")" >> "$TODODIR/done.txt" && sed -i "${pat}d" "$TODODIR/todo.txt" && tail -1 "$TODODIR/done.txt"
 }
 
-edit() {
-	case $2 in
-		a*) append "$@" ;;
-		*) $EDITOR "$TODODIR/todo.txt"
-	esac
+edit_task() {
+	$EDITOR "$TODODIR/todo.txt"
 }
 
-#ls() {
+#list_tasks() {
 	#awk -v pat="$2" 'index($0, pat){printf "%4s %s\n", NR, $0}' "$TODODIR/todo.txt" | sort -k2 | awk '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;33m"}/\(C\)/{cs="\033[1;32m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{print cs$0ce}'
 #}
 	# This version does not currently support case insensitive matching.
 
-# Regular expressions conflict with the identifier + for projects. The above version of ls() fixes this inside of todo(1). But if you want to manipulate the output later with regexp or even search for a term containing the + (e.g. a project like +work) you're gonna run into problems. The following version of ls() is a standard implementation, meaning:
-# 1) todo(1) with this second ls() will break when using + as an identifier for projects. USE A DIFFERENT IDENTIFIER.
-# 2) When using a different identifier and this second version of ls(), you can manipulate your output with regexp all day long and also search for a full project term (e.g. a project like _work).
+# Regular expressions conflict with the identifier + for projects. The above version of list_tasks() fixes this inside of todo(1). But if you want to manipulate the output later with regexp or even search for a term containing the + (e.g. a project like +work) you're gonna run into problems. The following version of list_tasks() is a standard implementation, meaning:
+# 1) todo(1) with this second list_tasks() will break when using + as an identifier for projects. USE A DIFFERENT IDENTIFIER.
+# 2) When using a different identifier and this second version of list_tasks(), you can manipulate your output with regexp all day long and also search for a full project term (e.g. a project like _work).
 
-ls() {
+list_tasks() {
 	awk -v pat="$2" '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;33m"}/\(C\)/{cs="\033[1;32m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"} tolower($0) ~ pat {printf cs"%4s %s\n", NR, $0ce}' "$TODODIR/todo.txt" | sort -i -t '\(' -k2
 }
 
-lscon() {
+list_contexts() {
 	grep -oh '[[:alnum:]]*@[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u
 }
 
-lsprj() {
+list_projects() {
 	grep -oh '[[:alnum:]]*_[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u
-	# Use the + for the first ls() version.
+	# Use the + for the first list_tasks() version.
 	# Use something else (like _) for the second version so that the regexp work.
 }
 
-prio() {
+priority_change() {
 	[ "$2" != '' ] && [ "$3" != '' ] && sed -i "$2"'s/(.)/('"$3"')/' "$TODODIR/todo.txt" && awk -v pat="$2" '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;33m"}/\(C\)/{cs="\033[1;32m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}{if(NR==pat)print cs $0 ce}' "$TODODIR/todo.txt"
 }
 
@@ -80,35 +60,35 @@ today() {
 	echo "todo: Current tasks"
 	if [ "$DUETODAY" != 0 ] ; then
 		echo "---> Due today, $(date '+%e %B %Y')"
-		ls "" "due:$(date +%F)"
+		list_tasks "" "due:$(date +%F)"
 		if [ "$DUEURGENT" != 0 ] ; then
 			echo "---> Due urgently/overdue"
-			ls "" "_urgent"
+			list_tasks "" "_urgent"
 		fi
 	elif [ "$DUETODAY" = 0 ] && [ "$DUEURGENT" != 0 ] ; then
 		echo "---> Nothing due today, $(date '+%e %B %Y')"
 		echo "---> Due urgently/overdue"
-		ls "" " _urgent"
+		list_tasks "" " _urgent"
 	else
 		echo "Nothing due! ;)"
 	fi
 }
 
-usage() { printf "todo(1) version 0.8.1 - simple todo list manager.
+usage() { printf "todo(1) version 0.8.2 - simple todo list manager.
 
-=> a[dd] [entry]			- Create a new entry.
-=> d[one] [entry]			- Mark [entry] as done.
-=> e[dit] [entry]			- Edit [entry] in your EDITOR.
-=> e[dit] a[ppend] [entry] [text]	- Appends [text] to [entry].
-=> f[inished]				- Show finished items.
-=> ls					- List current todo list. This works in a case-insensitive manner.
+=> append [number of task] [text]	- Append [text] to a task.
+=> create [text]			- Create a new entry.
+=> done [number of task]		- Mark the task as done.
+=> edit					- Edit todo.txt in EDITOR.
+=> finished				- Show finished items in PAGER.
+=> ls					- List current todo list. This only accepts lowercase letters but matches in a case-insensitive manner.
 => lc					- List all contexts currently in use.
 => lp					- List all projects currently active.
-=> p [entry] [priority]			- Set/Change priority of [entry] to [priority] (A-Z).
-=> r[eport]				- Create a report of the day containing the number of active and finished tasks.
-=> t[oday]				- List all tasks due today and also those marked _urgent.
+=> priority [number of task] [priority]	- Change priority of a task to [priority] (A-Z).
+=> report				- Create a report of the day containing the number of active and finished tasks.
+=> today				- List all tasks due today and also those marked _urgent.
 
-=> h[help]				- Show this message.
+=> help					- Show this message.
 Alternatively read the manpage.
 
 Expected environment variables:
@@ -123,9 +103,22 @@ todo expects your files to be in TODODIR/
 
 The syntax of todo.txt, specifically the + identifier for projects conflicts with regular expressions in awk. If you want to manipulate the output later on or list full project names, you're gonna have to tweak some of the functions a little - I included some guiding comments.
 
-Since version 0.7 the tweaked ls() function is used, resulting in the project identifier being changed from + to _ (+work -> _work).
+Since version 0.7 the tweaked list_tasks() function is used, resulting in the project identifier being changed from + to _ (+work -> _work).
 "
-exit 0
+exit 1
 }
 
-[ "$1" ] || usage && main "$@"
+case $1 in
+	a*) append "$@" ;;
+	c*) create_task "$@" ;;
+	d*) mark_done "$@" ;;
+	e*) edit_task "$@" ;;
+	f*) list_finished ;;
+	ls) list_tasks "$@" ;;
+	lc) list_contexts ;;
+	lp) list_projects ;;
+	p*) priority_change "$@" ;;
+	r*) report ;;
+	t*) today ;;
+	*) usage
+esac
