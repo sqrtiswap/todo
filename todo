@@ -59,14 +59,14 @@ today() {
 	DUEURGENT=$(grep -c _urgent "$TODODIR"/todo.txt)
 	echo "todo: Current tasks"
 	if [ "$DUETODAY" != 0 ] ; then
-		echo "---> Due today, $(date '+%e %B %Y')"
+		echo "---> Due today, $(date '+%d %B %Y')"
 		list_tasks "" "due:$(date +%F)"
 		if [ "$DUEURGENT" != 0 ] ; then
 			echo "---> Due urgently/overdue"
 			list_tasks "" "_urgent"
 		fi
 	elif [ "$DUETODAY" = 0 ] && [ "$DUEURGENT" != 0 ] ; then
-		echo "---> Nothing due today, $(date '+%e %B %Y')"
+		echo "---> Nothing due today, $(date '+%d %B %Y')"
 		echo "---> Due urgently/overdue"
 		list_tasks "" "_urgent"
 	else
