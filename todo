@@ -1,5 +1,7 @@
 #!/bin/sh
 
+TODODIR=$HOME/todo
+
 create_task() {
 	shift 1 && echo "(A) $(date +%F)" "$@" >> "$TODODIR/todo.txt"
 	awk '{ce="\033[0m"}/\(A\)/{cs="\033[1;31m"}/\(B\)/{cs="\033[1;33m"}/\(C\)/{cs="\033[1;32m"}/\(D\)/{cs="\033[1;34m"}/\(E\)/{cs="\033[0m"}END{printf "%4s %s\n", cs NR ce, cs $0 ce}' "$TODODIR/todo.txt"
