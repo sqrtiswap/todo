@@ -1,5 +1,7 @@
 #!/bin/sh
 
+#_verbose=0
+
 _reset="\033[0m"
 
 [ -n "$TODO_COLOUR_A" ] \
@@ -20,7 +22,11 @@ _reset="\033[0m"
 
 create_task() {
 	shift 1 && echo "(A) $(date +%F)" "$@" >> "$TODODIR/todo.txt"
+	#if [ ${_verbose} -gt 0 ] ; then
+		#echo "test"
+	#else
 	awk -v csR="${_reset}" -v csA="${_colourA}" -v csB="${_colourB}" -v csC="${_colourC}" -v csD="${_colourD}" '{ce=csR}/\(A\)/{cs=csA}/\(B\)/{cs=csB}/\(C\)/{cs=csC}/\(D\)/{cs=csD}/\(E\)/{cs=csR}END{printf "%4s %s\n", cs NR ce, cs $0 ce}' "$TODODIR/todo.txt"
+	#fi
 }
 
 append() {
@@ -32,7 +38,7 @@ list_finished() {
 }
 
 mark_done() {
-	[ "$2" != '' ] && pat="$2" && echo "x $(date +%F)" "$(sed -n "${pat}p" "$TODODIR/todo.txt")" >> "$TODODIR/done.txt" && sed -i "${pat}d" "$TODODIR/todo.txt" && tail -1 "$TODODIR/done.txt"
+	[ "$2" != '' ] && [ "$2" -le "$(wc -l "$TODODIR"/todo.txt)" ] && pat="$2" && echo "x $(date +%F)" "$(sed -n "${pat}p" "$TODODIR/todo.txt")" >> "$TODODIR/done.txt" && sed -i "${pat}d" "$TODODIR/todo.txt" && tail -1 "$TODODIR/done.txt"
 	# different version that removes the priority of the finished task:
 	#[ "$2" != '' ] && pat="$2" && echo "x $(date +%F)" "$(sed -e 's/(.) //g;'"${pat}"'q;d' "$TODODIR/todo.txt")" >> "$TODODIR/done.txt" && sed -i "${pat}d" "$TODODIR/todo.txt" && tail -1 "$TODODIR/done.txt"
 }
@@ -70,6 +76,10 @@ priority_change() {
 
 report() {
 	echo "$(date +%FT%TZ) $(awk 'END{print NR}' "$TODODIR/todo.txt") $(awk 'END{print NR}' "$TODODIR/done.txt")" >> "$TODODIR/report.txt" && tail -1 "$TODODIR/report.txt"
+}
+
+return_changes() {
+	echo "not yet implemented"
 }
 
 today() {
@@ -115,10 +125,10 @@ Expected environment variables:
 => TODODIR		- The directory where associated files are stored.
 
 Colours can be specified with environment variables:
-TODO_COLOUR_A	- Colour for priority A, defaults to \033[31m (red)
-TODO_COLOUR_B	- Colour for priority B, defaults to \033[33m (yellow)
-TODO_COLOUR_C	- Colour for priority C, defaults to \033[32m (green)
-TODO_COLOUR_D	- Colour for priority D, defaults to \033[1;34m (light blue)
+TODO_COLOUR_A	- Colour for priority A, defaults to \\033[31m (red)
+TODO_COLOUR_B	- Colour for priority B, defaults to \\033[33m (yellow)
+TODO_COLOUR_C	- Colour for priority C, defaults to \\033[32m (green)
+TODO_COLOUR_D	- Colour for priority D, defaults to \\033[1;34m (light blue)
 
 todo expects your files to be in TODODIR/
 	todo.txt	- Current todo list containing active items
@@ -131,6 +141,14 @@ Since version 0.7 the tweaked list_tasks() function is used, resulting in the pr
 "
 exit 1
 }
+
+#while getopts dfrtv: arg; do
+	#case ${arg} in
+		#v) _verbose=1 ;;
+		#*) usage
+	#esac
+#done
+#shift $((OPTIND - 1))
 
 case $1 in
 	a*) append "$@" ;;
