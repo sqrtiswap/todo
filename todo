@@ -38,7 +38,12 @@ list_finished() {
 }
 
 mark_done() {
-	[ "$2" != '' ] && [ "$2" -le "$(wc -l "$TODODIR"/todo.txt)" ] && pat="$2" && echo "x $(date +%F)" "$(sed -n "${pat}p" "$TODODIR/todo.txt")" >> "$TODODIR/done.txt" && sed -i "${pat}d" "$TODODIR/todo.txt" && tail -1 "$TODODIR/done.txt"
+	_num_of_tasks="$(grep -c '' "$TODODIR"/todo.txt)"
+	if [ "$2" != '' ] && [ "$2" -le "${_num_of_tasks}" ] ; then
+		pat="$2" && echo "x $(date +%F)" "$(sed -n "${pat}p" "$TODODIR/todo.txt")" >> "$TODODIR/done.txt" && sed -i "${pat}d" "$TODODIR/todo.txt" && tail -1 "$TODODIR/done.txt"
+	else
+		echo "Can't mark task $2 as done. There are only ${_num_of_tasks} tasks."
+	fi
 	# different version that removes the priority of the finished task:
 	#[ "$2" != '' ] && pat="$2" && echo "x $(date +%F)" "$(sed -e 's/(.) //g;'"${pat}"'q;d' "$TODODIR/todo.txt")" >> "$TODODIR/done.txt" && sed -i "${pat}d" "$TODODIR/todo.txt" && tail -1 "$TODODIR/done.txt"
 }
