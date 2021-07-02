@@ -107,7 +107,7 @@ today() {
 	fi
 }
 
-usage() { printf "todo(1) version 0.8.3 - simple todo list manager.
+usage() { printf "todo(1) version 0.8.3p0 - simple todo list manager.
 
 => append [number of task] [text]	- Append [text] to a task.
 => create [text]			- Create a new entry.
