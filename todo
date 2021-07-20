@@ -66,11 +66,19 @@ list_tasks() {
 }
 
 list_contexts() {
-	grep -oh '[[:alnum:]]*@[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u
+	projects=$(grep -oh ' @[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u)
+	echo "todo: Current contexts"
+	for x in ${projects} ; do
+		echo "    ${x}"
+	done
 }
 
 list_projects() {
-	grep -oh '[[:alnum:]]*_[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u
+	contexts=$(grep -oh ' _[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u)
+	echo "todo: Current projects"
+	for x in ${contexts} ; do
+		echo "    ${x}"
+	done
 	# Use the + for the first list_tasks() version.
 	# Use something else (like _) for the second version so that the regexp work.
 }
