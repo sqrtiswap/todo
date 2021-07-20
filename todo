@@ -93,7 +93,7 @@ today() {
 	echo "todo: Current tasks"
 	if [ "$DUETODAY" != 0 ] ; then
 		echo "---> Due today, $(date '+%d %B %Y')"
-		list_tasks "" "due:$(date +%F)"
+		list_tasks "" "due:$(date +%F)" | grep -v '_urgent'
 		if [ "$DUEURGENT" != 0 ] ; then
 			echo "---> Due urgently/overdue"
 			list_tasks "" "_urgent"
