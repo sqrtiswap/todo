@@ -69,7 +69,9 @@ list_contexts() {
 	projects=$(grep -oh ' @[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u)
 	echo "todo: Current contexts"
 	for x in ${projects} ; do
-		echo "    ${x}"
+		count=$(grep -c "${x}" "$TODODIR/todo.txt")
+		printf "%4.4s" "${count}"
+		echo " ${x}"
 	done
 }
 
@@ -77,7 +79,9 @@ list_projects() {
 	contexts=$(grep -oh ' _[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u)
 	echo "todo: Current projects"
 	for x in ${contexts} ; do
-		echo "    ${x}"
+		count=$(grep -c "${x}" "$TODODIR/todo.txt")
+		printf "%4.4s" "${count}"
+		echo " ${x}"
 	done
 	# Use the + for the first list_tasks() version.
 	# Use something else (like _) for the second version so that the regexp work.
