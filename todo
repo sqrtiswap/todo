@@ -125,44 +125,12 @@ today() {
 	fi
 }
 
-usage() { printf "todo(1) version 0.8.3p1 - simple todo list manager.
-
-=> append [number of task] [text]	- Append [text] to a task.
-=> create [text]			- Create a new entry.
-=> done [number of task]		- Mark the task as done.
-=> edit					- Edit todo.txt in EDITOR.
-=> finished				- Show finished items in PAGER.
-=> ls					- List current todo list. This only accepts lowercase letters but matches in a case-insensitive manner.
-=> lc					- List all contexts currently in use.
-=> lp					- List all projects currently active.
-=> priority [number of task] [priority]	- Change priority of a task to [priority] (A-Z).
-=> report				- Create a report of the day containing the number of active and finished tasks.
-=> today				- List all tasks due today and also those marked _urgent.
-
-=> help					- Show this message.
-Alternatively read the manpage.
-
-Expected environment variables:
-=> EDITOR		- The editor you want to use, when opening todo.txt
-=> PAGER		- The pager you want to use, when taking a look at accomplished tasks.
-=> TODODIR		- The directory where associated files are stored.
-
-Colours can be specified with environment variables:
-TODO_COLOUR_A  - Colour for priority A, defaults to \\\033[31m (\033[31mred\033[0m)
-TODO_COLOUR_B  - Colour for priority B, defaults to \\\033[33m (\033[33myellow\033[0m)
-TODO_COLOUR_C  - Colour for priority C, defaults to \\\033[32m (\033[32mgreen\033[0m)
-TODO_COLOUR_D  - Colour for priority D, defaults to \\\033[1;34m (\033[1;34mlight blue\033[0m)
-
-todo expects your files to be in TODODIR/
-	todo.txt	- Current todo list containing active items
-	done.txt	- List of finished items
-	report.txt	- List of reports
-
-The syntax of todo.txt, specifically the + identifier for projects conflicts with regular expressions in awk. If you want to manipulate the output later on or list full project names, you're gonna have to tweak some of the functions a little - I included some guiding comments.
-
-Since version 0.7 the tweaked list_tasks() function is used, resulting in the project identifier being changed from + to _ (+work -> _work).
-"
-exit 1
+usage() { cat << USAGE
+todo(1) version 0.8.3p1 - simple todo list manager.
+usage: ${0##*/}	[-v] [-d file] [-r file] [-t file] [-f directory]
+		[-p priority] command
+USAGE
+	exit 1
 }
 
 #while getopts d:p:r:t:v arg; do

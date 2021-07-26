@@ -1,0 +1,127 @@
+.\"	$OpenBSD$
+.\"
+.\" Copyright (c) 2020, 2021 Alexander Möller <alexander.moeller@detmold.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate: July 26 2021 $
+.Dt TODO 1
+.Os
+.Sh NAME
+.Nm todo
+.Nd simple todo list
+.Sh SYNOPSIS
+.Nm todo
+.Op Fl v
+.Op Fl d file
+.Op Fl r file
+.Op Fl t file
+.Op Fl p priority
+.Op Fl f directory
+.Op command
+.Sh DESCRIPTION
+.Nm
+is a simple todo list utilising only basic POSIX shell tools such as
+.Xr echo 1 ,
+.Xr sed 1
+and
+.Xr awk 1 .
+.Pp
+The options are as follows:
+.Bl -tag -width Ds
+.It Fl v
+Enable verbose output.
+.It Fl p Ar priority
+Specify the priority for a newly created entry. Otherwise (A) will be used.
+.It Fl d Ar file
+Path to the done.txt file.
+.It Fl r Ar file
+Path to the report.txt file.
+.It Fl t Ar file
+Path to the todo.txt file.
+.It Fl f Ar directory
+Path to the todo directory.
+.El
+.Pp
+The following commands are available:
+.Bl -tag -width Ds
+.It Cm append Ar tasknumber Ar addition
+Append an addition to the specified task.
+.It Cm create Ar text
+Add a new task.
+.It Cm done Ar tasknumber
+Mark the specified task as done.
+.It Cm edit
+Edit todo.txt in $EDITOR.
+.It Cm finished
+Open done.txt in $PAGER.
+.It Cm ls Ar keyword
+Show the list of existing entries. A keyword can be provided to only list matching entries.
+.It Cm lc
+Show the list of existing contexts including amount of associated tasks.
+.It Cm lp
+Show the list of existing projects including amount of associated tasks.
+.It Cm priority Ar tasknumber Ar priority
+Change the priority of the specified task.
+.It Cm report
+Generate a report.
+.It Cm today
+Show the list of tasks due today as well as those market _urgent.
+.El
+.Sh FILES
+.Bl -tag -width "~/todo/report.txt" -compact
+.It Pa ~/todo/done.txt
+File listing finished tasks.
+.It Pa ~/todo/report.txt
+File containing the generated reports.
+.It Pa ~/todo/todo.txt
+File listing current tasks.
+.It Pa ~/todo/
+todo directory.
+.El
+.Sh ENVIRONMENT VARIABLES
+.Bl -tag -width "TODO_COLOUR_A" -compact
+.It Pa TODO_COLOUR_A
+Colour for priority A. Defaults to \\033[31m (red).
+.It Pa TODO_COLOUR_B
+Colour for priority B. Defaults to \\033[33m (yellow).
+.It Pa TODO_COLOUR_C
+Colour for priority C. Defaults to \\033[32m (green).
+.It Pa TODO_COLOUR_D
+Colour for priority D. Defaults to \\033[1;34m (light blue).
+.El
+.Sh EXAMPLES
+Change the priority of task 1 to (B):
+.Bd -literal -offset indent
+$ todo priority B 1
+.Ed
+.Sh CAVEATS
+ls only accepts lowercase letters but matches in a case-insensitive manner.
+.Ed
+.Sh NOTES
+The syntax of todo.txt, specifically the + identifier for projects conflicts with regular expressions in
+.Xr awk 1
+. Therefore an alternative _ identifier is used by default since version 0.7.
+.Ed
+.Sh HISTORY
+.Nm is a complete rewrite from scratch of the popular todo.txt utility. The intention was to provide a simpler and POSIX compliant version.
+.Ed
+.Sh SEE ALSO
+.Xr awk 1 ,
+.Xr grep 1 ,
+.Xr less 1 ,
+.Xr sed 1
+.Sh AUTHORS
+.Nm
+was written by
+.An Alexander Möller Aq Mt alexander.moeller@detmold.com .
