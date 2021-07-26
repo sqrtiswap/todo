@@ -100,26 +100,26 @@ return_changes() {
 }
 
 today() {
-	DUETODAY=$(grep -c "$(date +%F)" "$TODODIR"/todo.txt)
-	DUEURGENT=$(grep -c _urgent "$TODODIR"/todo.txt)
+	due_today=$(grep -c " due:$(date +%F)" "$TODODIR"/todo.txt)
+	due_urgent=$(grep -c ' _urgent' "$TODODIR"/todo.txt)
 	echo "todo: Current tasks"
-	if [ "$DUETODAY" != 0 ] ; then
+	if [ "${due_today}" != 0 ] ; then
 		echo "---> Due today, $(date '+%d %B %Y')"
-		list_tasks "" "due:$(date +%F)" | grep -v '_urgent'
-		if [ "$DUEURGENT" != 0 ] ; then
+		list_tasks "" "due:$(date +%F)" | grep -v ' _urgent'
+		if [ "${due_urgent}" != 0 ] ; then
 			echo "---> Due urgently/overdue"
-			list_tasks "" "_urgent"
+			list_tasks "" " _urgent"
 		fi
-	elif [ "$DUETODAY" = 0 ] && [ "$DUEURGENT" != 0 ] ; then
+	elif [ "${due_today}" = 0 ] && [ "${due_urgent}" != 0 ] ; then
 		echo "---> Nothing due today, $(date '+%d %B %Y')"
 		echo "---> Due urgently/overdue"
-		list_tasks "" "_urgent"
+		list_tasks "" " _urgent"
 	else
 		echo "Nothing due! ;)"
 	fi
 }
 
-usage() { printf "todo(1) version 0.8.3p0 - simple todo list manager.
+usage() { printf "todo(1) version 0.8.3p1 - simple todo list manager.
 
 => append [number of task] [text]	- Append [text] to a task.
 => create [text]			- Create a new entry.
@@ -142,10 +142,10 @@ Expected environment variables:
 => TODODIR		- The directory where associated files are stored.
 
 Colours can be specified with environment variables:
-TODO_COLOUR_A	- Colour for priority A, defaults to \\033[31m (red)
-TODO_COLOUR_B	- Colour for priority B, defaults to \\033[33m (yellow)
-TODO_COLOUR_C	- Colour for priority C, defaults to \\033[32m (green)
-TODO_COLOUR_D	- Colour for priority D, defaults to \\033[1;34m (light blue)
+TODO_COLOUR_A  - Colour for priority A, defaults to \\\033[31m (\033[31mred\033[0m)
+TODO_COLOUR_B  - Colour for priority B, defaults to \\\033[33m (\033[33myellow\033[0m)
+TODO_COLOUR_C  - Colour for priority C, defaults to \\\033[32m (\033[32mgreen\033[0m)
+TODO_COLOUR_D  - Colour for priority D, defaults to \\\033[1;34m (\033[1;34mlight blue\033[0m)
 
 todo expects your files to be in TODODIR/
 	todo.txt	- Current todo list containing active items
