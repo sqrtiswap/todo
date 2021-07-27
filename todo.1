@@ -22,12 +22,11 @@
 .Nd simple todo list
 .Sh SYNOPSIS
 .Nm todo
-.Op Fl v
+.Op Fl q
 .Op Fl d file
 .Op Fl r file
 .Op Fl t file
 .Op Fl p priority
-.Op Fl f directory
 .Op command
 .Sh DESCRIPTION
 .Nm
@@ -39,11 +38,11 @@ and
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
-.It Fl v
-Enable verbose output.
+.It Fl q
+Quiet mode. Perform the action, but don't display anything on standard output.
 Applies to append, create, done, priority, report.
 .It Fl p Ar priority
-Specify the priority for a newly created entry. Otherwise (A) will be used.
+Specify the priority for a newly created entry. Otherwise A will be used.
 .It Fl d Ar file
 Path to the done.txt file.
 .It Fl r Ar file
@@ -66,6 +65,7 @@ Edit todo.txt in $EDITOR.
 Open done.txt in $PAGER.
 .It Cm ls Ar keyword
 Show the list of existing entries. A keyword can be provided to only list matching entries.
+Note that the matching is case insensitive.
 .It Cm lc
 Show the list of existing contexts including amount of associated tasks.
 .It Cm lp
@@ -75,7 +75,20 @@ Change the priority of the specified task.
 .It Cm report
 Generate a report.
 .It Cm today
-Show the list of tasks due today as well as those market _urgent.
+Show the list of tasks due today as well as those marked +urgent.
+.El
+.Sh NOTES
+Most of the commands only depend on the first letter. So instead of using
+.Bd -literal -offset indent
+$ todo create example task
+.Ed
+.Pp
+it is also possible to use
+.Bd -literal -offset indent
+$ todo c example task
+.Ed
+.Pp
+The only exceptions to this are ls, lc and lp.
 .El
 .Sh ENVIRONMENT VARIABLES
 .Bl -tag -width "TODO_COLOUR_A" -compact
@@ -106,7 +119,7 @@ File listing finished tasks.
 .It Pa $TODODIR/report.txt
 File containing the generated reports.
 .It Pa $TODODIR/todo.txt
-File listing current tasks.
+File listing active tasks.
 .El
 .Sh EXAMPLES
 Change the priority of task 1 to B:
@@ -114,9 +127,9 @@ Change the priority of task 1 to B:
 $ todo priority B 1
 .Ed
 .Pp
-Create task "example task" with priority C and get it repeated back to stdio:
+Create task "example task" with priority C, but don't display it to standard output:
 .Bd -literal -offset indent
-$ todo -p C -v example task
+$ todo -p C -q create example task
 .Ed
 .Sh HISTORY
 .Nm

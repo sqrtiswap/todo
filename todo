@@ -14,6 +14,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+set -e
+
 _reset="\033[0m"
 
 [ -n "$TODO_COLOUR_A" ] \
@@ -41,7 +43,7 @@ _file_todo=${_file_todo:-${TODODIR}/todo.txt}
 _file_done=${_file_done:-${TODODIR}/done.txt}
 _file_report=${_file_report:-${TODODIR}/report.txt}
 
-_verbose=0
+_quiet=0
 _priority=0
 
 create_task() {
@@ -51,9 +53,8 @@ create_task() {
 	else
 		echo "(A) $(date +%F)" "$@" >> "${_file_todo}"
 	fi
-	if [ "${_verbose}" = 1 ] ; then
-		report_change "create"
-	fi
+	[ "${_quiet}" = 1 ] \
+		|| report_change "create"
 }
 
 append() {
@@ -61,8 +62,8 @@ append() {
 		_line="$2"
 		shift 2
 		sed -i "${_line}"'s/$/ '"$*"'/' "${_file_todo}"
-		[ "${_verbose}" = 1 ] \
-			&& report_change "append" "${_line}"
+		[ "${_quiet}" = 1 ] \
+			|| report_change "append" "${_line}"
 	fi
 }
 
@@ -76,8 +77,8 @@ mark_done() {
 		arg="$2"
 		echo "x $(date +%F)" "$(sed -n "${arg}p" "${_file_todo}")" >> "${_file_done}"
 		sed -i "${arg}d" "${_file_todo}"
-		[ "${_verbose}" = 1 ] \
-			&& report_change "mdone"
+		[ "${_quiet}" = 1 ] \
+			|| report_change "mdone"
 	else
 		echo "Can't mark task $2 as done. There are only ${_num_of_tasks} tasks."
 	fi
@@ -109,19 +110,19 @@ list_tasks() {
 }
 
 list_contexts() {
-	projects=$(grep -oh ' @[[:alnum:]]*' "${_file_todo}" | sort -u)
-	for x in ${projects} ; do
-		count=$(grep -c "${x}" "${_file_todo}")
-		printf "%4.4s" "${count}"
+	_projects=$(grep -oh ' @[[:alnum:]]*' "${_file_todo}" | sort -u)
+	for x in ${_projects} ; do
+		_count=$(grep -c "${x}" "${_file_todo}")
+		printf "%4.4s" "${_count}"
 		echo " ${x}"
 	done
 }
 
 list_projects() {
-	contexts=$(grep -oh ' +[[:alnum:]]*' "${_file_todo}" | sort -u)
-	for x in ${contexts} ; do
-		count=$(grep -c "${x}" "${_file_todo}")
-		printf "%4.4s" "${count}"
+	_contexts=$(grep -oh ' +[[:alnum:]]*' "${_file_todo}" | sort -u)
+	for x in ${_contexts} ; do
+		_count=$(grep -c "${x}" "${_file_todo}")
+		printf "%4.4s" "${_count}"
 		echo " ${x}"
 	done
 }
@@ -129,8 +130,8 @@ list_projects() {
 priority_change() {
 	if [ -n "$2" ] && [ -n "$3" ] ; then
 		sed -i "$2"'s/(.)/('"$3"')/' "${_file_todo}"
-		[ "${_verbose}" = 1 ] \
-			&& report_change "priority" "$2"
+		[ "${_quiet}" = 1 ] \
+			|| report_change "priority" "$2"
 	fi
 }
 
@@ -138,8 +139,8 @@ report() {
 	_nr_active=$(grep -c '' "${_file_todo}")
 	_nr_done=$(grep -c '' "${_file_done}")
 	echo "$(date +%FT%TZ) ${_nr_active} ${_nr_done}" >> "${_file_report}"
-	[ "${_verbose}" = 1 ] \
-		&& report_change "report"
+	[ "${_quiet}" = 1 ] \
+		|| report_change "report"
 }
 
 report_change() {
@@ -161,16 +162,16 @@ report_change() {
 }
 
 today() {
-	due_today=$(grep -c " due:$(date +%F)" "${_file_todo}")
-	due_urgent=$(grep -c ' +urgent' "${_file_todo}")
-	if [ "${due_today}" != 0 ] ; then
+	_due_today=$(grep -c " due:$(date +%F)" "${_file_todo}")
+	_due_urgent=$(grep -c ' +urgent' "${_file_todo}")
+	if [ "${_due_today}" != 0 ] ; then
 		echo "---> Due today, $(date '+%d %B %Y')"
-		list_tasks "" "due:$(date +%F)" | grep -v ' +urgent'
-		if [ "${due_urgent}" != 0 ] ; then
+		list_tasks "" " due:$(date +%F)" | grep -v ' +urgent'
+		if [ "${_due_urgent}" != 0 ] ; then
 			echo "---> Due urgently/overdue"
 			list_tasks "" " +urgent"
 		fi
-	elif [ "${due_today}" = 0 ] && [ "${due_urgent}" != 0 ] ; then
+	elif [ "${_due_today}" = 0 ] && [ "${_due_urgent}" != 0 ] ; then
 		echo "---> Nothing due today, $(date '+%d %B %Y')"
 		echo "---> Due urgently/overdue"
 		list_tasks "" " +urgent"
@@ -180,20 +181,22 @@ today() {
 }
 
 usage() { cat << USAGE
-todo(1) version 0.9 - simple todo list manager.
-usage: ${0##*/}	[-v] [-d file] [-r file] [-t file] [-f directory]
+todo(1) version 0.9.1 - simple todo list manager.
+usage: ${0##*/}	[-q] [-d file] [-r file] [-t file]
 		[-p priority] command
 USAGE
 	exit 1
 }
 
-while getopts d:p:r:t:v arg; do
+set +e
+
+while getopts d:r:t:p:q arg; do
 	case ${arg} in
 		d) _file_done="${OPTARG}" ;;
-		p) _priority=1 && _p="${OPTARG}" ;;
 		r) _file_report="${OPTARG}" ;;
 		t) _file_todo="${OPTARG}" ;;
-		v) _verbose=1 ;;
+		p) _priority=1 && _p="${OPTARG}" ;;
+		q) _quiet=1 ;;
 		*) usage
 	esac
 done
