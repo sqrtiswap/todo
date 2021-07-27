@@ -92,7 +92,15 @@ edit_task() {
 # 2) When using a different identifier and this second version of list_tasks(), you can manipulate your output with regexp all day long and also search for a full project term (e.g. a project like _work).
 
 list_tasks() {
-	awk -v pat="$2" -v csR="${_reset}" -v csA="${_colourA}" -v csB="${_colourB}" -v csC="${_colourC}" -v csD="${_colourD}" '{ce=csR}/\(A\)/{cs=csA}/\(B\)/{cs=csB}/\(C\)/{cs=csC}/\(D\)/{cs=csD}/\(E\)/{cs=csR} tolower($0) ~ pat {printf cs"%4s %s\n", NR, $0ce}' "$TODODIR/todo.txt" | sort -i -t '\(' -k2
+	awk -v arg="$2" \
+	-v csR="${_reset}" \
+	-v csA="${_colourA}" \
+	-v csB="${_colourB}" \
+	-v csC="${_colourC}" \
+	-v csD="${_colourD}" \
+	'{ce=csR}/\(A\)/{cs=csA}/\(B\)/{cs=csB}/\(C\)/{cs=csC}/\(D\)/{cs=csD}/\(E\)/{cs=csR} tolower($0) ~ arg {printf cs"%4s %s\n", NR, $0ce}' \
+	"$TODODIR/todo.txt" \
+	| sort -i -t '\(' -k2
 }
 
 list_contexts() {
@@ -115,7 +123,11 @@ list_projects() {
 }
 
 priority_change() {
-	[ "$2" != '' ] && [ "$3" != '' ] && sed -i "$2"'s/(.)/('"$3"')/' "$TODODIR/todo.txt" && awk -v pat="$2" -v csR="${_reset}" -v csA="${_colourA}" -v csB="${_colourB}" -v csC="${_colourC}" -v csD="${_colourD}" '{ce=csR}/\(A\)/{cs=csA}/\(B\)/{cs=csB}/\(C\)/{cs=csC}/\(D\)/{cs=csD}/\(E\)/{cs=csR}{if(NR==pat)print cs $0 ce}' "$TODODIR/todo.txt"
+	if [ -n "$2" ] && [ -n "$3" ] ; then
+		sed -i "$2"'s/(.)/('"$3"')/' "$TODODIR/todo.txt"
+		[ "${_verbose}" = 1 ] \
+			&& report_change "priority" "$2"
+	fi
 }
 
 report() {
@@ -126,10 +138,11 @@ report() {
 
 report_change() {
 	case $1 in
-		append)	_line="$2" ;;
-		create)	_line="$(grep -c '' "$TODODIR"/todo.txt)" ;;
-		mdone)	tail -1 "$TODODIR/done.txt" ;;
-		report)	tail -1 "$TODODIR/report.txt"
+		append) _line="$2" ;;
+		create) _line="$(grep -c '' "$TODODIR"/todo.txt)" ;;
+		mdone) tail -1 "$TODODIR/done.txt" ;;
+		priority) _line="$2" ;;
+		report) tail -1 "$TODODIR/report.txt"
 	esac
 	awk -v line="${_line}" \
 	-v csR="${_reset}" \
