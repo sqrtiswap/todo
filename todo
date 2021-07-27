@@ -55,9 +55,11 @@ create_task() {
 
 append() {
 	if [ -n "$2" ] && [ -n "$3" ] ; then
-		sed -i "$2"'s/$/ '"$3"'/' "$TODODIR/todo.txt"
+		_line="$2"
+		shift 2
+		sed -i "${_line}"'s/$/ '"$*"'/' "$TODODIR/todo.txt"
 		[ "${_verbose}" = 1 ] \
-			&& report_change "append" "$2"
+			&& report_change "append" "${_line}"
 	fi
 }
 
