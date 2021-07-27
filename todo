@@ -36,7 +36,7 @@ _reset="\033[0m"
 
 [ -n "$PAGER" ] || PAGER="less"
 
-TODODIR=${TODODIR:-${HOME}/todo/}
+TODODIR=${TODODIR:-${HOME}/.todo/}
 
 _verbose=0
 _priority=0
@@ -48,11 +48,17 @@ create_task() {
 	else
 		echo "(A) $(date +%F)" "$@" >> "$TODODIR/todo.txt"
 	fi
-	awk -v csR="${_reset}" -v csA="${_colourA}" -v csB="${_colourB}" -v csC="${_colourC}" -v csD="${_colourD}" '{ce=csR}/\(A\)/{cs=csA}/\(B\)/{cs=csB}/\(C\)/{cs=csC}/\(D\)/{cs=csD}/\(E\)/{cs=csR}END{printf "%4s %s\n", cs NR ce, cs $0 ce}' "$TODODIR/todo.txt"
+	if [ "${_verbose}" = 1 ] ; then
+		report_change "create"
+	fi
 }
 
 append() {
-	[ "$2" != '' ] && [ "$3" != '' ] && sed -i "$2"'s/$/ '"$3"'/' "$TODODIR/todo.txt" && awk -v pat="$2" -v csR="${_reset}" -v csA="${_colourA}" -v csB="${_colourB}" -v csC="${_colourC}" -v csD="${_colourD}" '{ce=csR}/\(A\)/{cs=csA}/\(B\)/{cs=csB}/\(C\)/{cs=csC}/\(D\)/{cs=csD}/\(E\)/{cs=csR}{if(NR==pat)print cs $0 ce}' "$TODODIR/todo.txt"
+	if [ -n "$2" ] && [ -n "$3" ] ; then
+		sed -i "$2"'s/$/ '"$3"'/' "$TODODIR/todo.txt"
+		[ "${_verbose}" = 1 ] \
+			&& report_change "append" "$2"
+	fi
 }
 
 list_finished() {
@@ -61,8 +67,12 @@ list_finished() {
 
 mark_done() {
 	_num_of_tasks="$(grep -c '' "$TODODIR"/todo.txt)"
-	if [ "$2" != '' ] && [ "$2" -le "${_num_of_tasks}" ] ; then
-		pat="$2" && echo "x $(date +%F)" "$(sed -n "${pat}p" "$TODODIR/todo.txt")" >> "$TODODIR/done.txt" && sed -i "${pat}d" "$TODODIR/todo.txt" && tail -1 "$TODODIR/done.txt"
+	if [ -n "$2" ] && [ "$2" -le "${_num_of_tasks}" ] ; then
+		arg="$2"
+		echo "x $(date +%F)" "$(sed -n "${arg}p" "$TODODIR/todo.txt")" >> "$TODODIR/done.txt"
+		sed -i "${arg}d" "$TODODIR/todo.txt"
+		[ "${_verbose}" = 1 ] \
+			&& report_change "mdone"
 	else
 		echo "Can't mark task $2 as done. There are only ${_num_of_tasks} tasks."
 	fi
@@ -109,7 +119,26 @@ priority_change() {
 }
 
 report() {
-	echo "$(date +%FT%TZ) $(awk 'END{print NR}' "$TODODIR/todo.txt") $(awk 'END{print NR}' "$TODODIR/done.txt")" >> "$TODODIR/report.txt" && tail -1 "$TODODIR/report.txt"
+	echo "$(date +%FT%TZ) $(grep -c '' "$TODODIR/todo.txt") $(grep -c '' "$TODODIR/done.txt")" >> "$TODODIR/report.txt"
+	[ "${_verbose}" = 1 ] \
+		&& report_change "report"
+}
+
+report_change() {
+	case $1 in
+		append)	_line="$2" ;;
+		create)	_line="$(grep -c '' "$TODODIR"/todo.txt)" ;;
+		mdone)	tail -1 "$TODODIR/done.txt" ;;
+		report)	tail -1 "$TODODIR/report.txt"
+	esac
+	awk -v line="${_line}" \
+	-v csR="${_reset}" \
+	-v csA="${_colourA}" \
+	-v csB="${_colourB}" \
+	-v csC="${_colourC}" \
+	-v csD="${_colourD}" \
+	'{ce=csR}/\(A\)/{cs=csA}/\(B\)/{cs=csB}/\(C\)/{cs=csC}/\(D\)/{cs=csD}/\(E\)/{cs=csR}{if(NR==line)printf "%4s %s\n", cs NR ce, cs $0 ce}' \
+	"$TODODIR/todo.txt"
 }
 
 today() {

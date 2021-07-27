@@ -79,17 +79,6 @@ Generate a report.
 .It Cm today
 Show the list of tasks due today as well as those market _urgent.
 .El
-.Sh FILES
-.Bl -tag -width "~/todo/report.txt" -compact
-.It Pa ~/todo/done.txt
-File listing finished tasks.
-.It Pa ~/todo/report.txt
-File containing the generated reports.
-.It Pa ~/todo/todo.txt
-File listing current tasks.
-.It Pa ~/todo/
-todo directory. See ENVIRONMENT VARIABLES.
-.El
 .Sh ENVIRONMENT VARIABLES
 .Bl -tag -width "TODO_COLOUR_A" -compact
 .It Pa EDITOR
@@ -101,7 +90,8 @@ Pager to use for the finished command. Defaults to
 .It Pa TODODIR
 Directory
 .Nm
-uses. Defaults to ~/todo/.
+uses. Defaults to $HOME/.todo/.
+.Pp
 .It Pa TODO_COLOUR_A
 Colour for priority A. Defaults to \\033[31m (red).
 .It Pa TODO_COLOUR_B
@@ -111,10 +101,24 @@ Colour for priority C. Defaults to \\033[32m (green).
 .It Pa TODO_COLOUR_D
 Colour for priority D. Defaults to \\033[1;34m (light blue).
 .El
+.Sh FILES
+.Bl -tag -width "$TODODIR/report.txt" -compact
+.It Pa $TODODIR/done.txt
+File listing finished tasks.
+.It Pa $TODODIR/report.txt
+File containing the generated reports.
+.It Pa $TODODIR/todo.txt
+File listing current tasks.
+.El
 .Sh EXAMPLES
-Change the priority of task 1 to (B):
+Change the priority of task 1 to B:
 .Bd -literal -offset indent
 $ todo priority B 1
+.Ed
+.Pp
+Create task "example task" with priority C and get it repeated back to stdio:
+.Bd -literal -offset indent
+$ todo -p C -v example task
 .Ed
 .Sh CAVEATS
 ls only accepts lowercase letters but matches in a case-insensitive manner.
