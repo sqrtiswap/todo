@@ -32,13 +32,22 @@ _reset="\033[0m"
 	&& _colourD="$TODO_COLOUR_D" \
 	|| _colourD="\033[1;34m"
 
-#TODODIR=${TODODIR:-${HOME}/todo/}
+[ -n "$EDITOR" ] || EDITOR="vi"
 
-#_verbose=0
-#_priority=0
+[ -n "$PAGER" ] || PAGER="less"
+
+TODODIR=${TODODIR:-${HOME}/todo/}
+
+_verbose=0
+_priority=0
 
 create_task() {
-	shift 1 && echo "(A) $(date +%F)" "$@" >> "$TODODIR/todo.txt"
+	shift 1
+	if [ "${_priority}" = 1 ] ; then
+		echo "(${_p}) $(date +%F)" "$@" >> "$TODODIR/todo.txt"
+	else
+		echo "(A) $(date +%F)" "$@" >> "$TODODIR/todo.txt"
+	fi
 	awk -v csR="${_reset}" -v csA="${_colourA}" -v csB="${_colourB}" -v csC="${_colourC}" -v csD="${_colourD}" '{ce=csR}/\(A\)/{cs=csA}/\(B\)/{cs=csB}/\(C\)/{cs=csC}/\(D\)/{cs=csD}/\(E\)/{cs=csR}END{printf "%4s %s\n", cs NR ce, cs $0 ce}' "$TODODIR/todo.txt"
 }
 
@@ -57,8 +66,6 @@ mark_done() {
 	else
 		echo "Can't mark task $2 as done. There are only ${_num_of_tasks} tasks."
 	fi
-	# different version that removes the priority of the finished task:
-	#[ "$2" != '' ] && pat="$2" && echo "x $(date +%F)" "$(sed -e 's/(.) //g;'"${pat}"'q;d' "$TODODIR/todo.txt")" >> "$TODODIR/done.txt" && sed -i "${pat}d" "$TODODIR/todo.txt" && tail -1 "$TODODIR/done.txt"
 }
 
 edit_task() {
@@ -89,13 +96,12 @@ list_contexts() {
 
 list_projects() {
 	contexts=$(grep -oh ' _[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u)
+	#contexts=$(grep -oh ' +[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u)
 	for x in ${contexts} ; do
 		count=$(grep -c "${x}" "$TODODIR/todo.txt")
 		printf "%4.4s" "${count}"
 		echo " ${x}"
 	done
-	# Use the + for the first list_tasks() version.
-	# Use something else (like _) for the second version so that the regexp work.
 }
 
 priority_change() {
@@ -121,7 +127,7 @@ today() {
 		echo "---> Due urgently/overdue"
 		list_tasks "" " _urgent"
 	else
-		echo "Nothing due! ;)"
+		echo "Nothing due today! ;)"
 	fi
 }
 
@@ -133,21 +139,21 @@ USAGE
 	exit 1
 }
 
-#while getopts d:p:r:t:v arg; do
-	#case ${arg} in
-		#d) _file_done="${OPTARG}" ;;
-		#p) _priority=1 ;;
-		#r) _file_report="${OPTARG}" ;;
-		#t) _file_todo="${OPTARG}" ;;
-		#v) _verbose=1 ;;
-		#*) usage
-	#esac
-#done
-#shift $((OPTIND - 1))
+while getopts d:p:r:t:v arg; do
+	case ${arg} in
+		d) _file_done="${OPTARG}" ;;
+		p) _priority=1 && _p="${OPTARG}" ;;
+		r) _file_report="${OPTARG}" ;;
+		t) _file_todo="${OPTARG}" ;;
+		v) _verbose=1 ;;
+		*) usage
+	esac
+done
+shift $((OPTIND - 1))
 
-#_file_todo=${_file_todo:-${TODODIR}/todo/todo.txt}
-#_file_done=${_file_done:-${TODODIR}/todo/done.txt}
-#_file_report=${_file_report:-${TODODIR}/todo/report.txt}
+_file_todo=${_file_todo:-${TODODIR}/todo/todo.txt}
+_file_done=${_file_done:-${TODODIR}/todo/done.txt}
+_file_report=${_file_report:-${TODODIR}/todo/report.txt}
 
 case $1 in
 	a*) append "$@" ;;

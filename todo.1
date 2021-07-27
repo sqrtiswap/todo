@@ -41,6 +41,7 @@ The options are as follows:
 .Bl -tag -width Ds
 .It Fl v
 Enable verbose output.
+Applies to append, create, done, priority, report.
 .It Fl p Ar priority
 Specify the priority for a newly created entry. Otherwise (A) will be used.
 .It Fl d Ar file
@@ -87,10 +88,20 @@ File containing the generated reports.
 .It Pa ~/todo/todo.txt
 File listing current tasks.
 .It Pa ~/todo/
-todo directory.
+todo directory. See ENVIRONMENT VARIABLES.
 .El
 .Sh ENVIRONMENT VARIABLES
 .Bl -tag -width "TODO_COLOUR_A" -compact
+.It Pa EDITOR
+Editor to use for the edit command. Defaults to
+.Xr vi 1 .
+.It Pa PAGER
+Pager to use for the finished command. Defaults to
+.Xr less 1 .
+.It Pa TODODIR
+Directory
+.Nm
+uses. Defaults to ~/todo/.
 .It Pa TODO_COLOUR_A
 Colour for priority A. Defaults to \\033[31m (red).
 .It Pa TODO_COLOUR_B
@@ -114,7 +125,8 @@ The syntax of todo.txt, specifically the + identifier for projects conflicts wit
 . Therefore an alternative _ identifier is used by default since version 0.7.
 .Ed
 .Sh HISTORY
-.Nm is a complete rewrite from scratch of the popular todo.txt utility. The intention was to provide a simpler and POSIX compliant version.
+.Nm
+is a complete rewrite from scratch of the popular todo.txt utility. The intention was to provide a simpler and POSIX compliant version.
 .Ed
 .Sh SEE ALSO
 .Xr awk 1 ,
