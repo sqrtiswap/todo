@@ -14,7 +14,7 @@
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
-.Dd $Mdocdate: July 26 2021 $
+.Dd $Mdocdate: July 27 2021 $
 .Dt TODO 1
 .Os
 .Sh NAME
@@ -118,17 +118,15 @@ Create task "example task" with priority C and get it repeated back to stdio:
 .Bd -literal -offset indent
 $ todo -p C -v example task
 .Ed
-.Sh CAVEATS
-ls only accepts lowercase letters but matches in a case-insensitive manner.
-.Ed
-.Sh NOTES
-The syntax of todo.txt, specifically the + identifier for projects conflicts with regular expressions in
-.Xr awk 1
-. Therefore an alternative _ identifier is used by default since version 0.7.
-.Ed
 .Sh HISTORY
 .Nm
 is a complete rewrite from scratch of the popular todo.txt utility. The intention was to provide a simpler and POSIX compliant version.
+The syntax of todo.txt, specifically the + identifier for projects conflicts with regular expressions in
+.Xr awk 1 .
+Therefore an alternative _ identifier was used by default from version 0.7 to 0.8.3p1.
+Since then the
+.Xr awk 1
+command used is identifier agnostic and the switch back was made.
 .Ed
 .Sh SEE ALSO
 .Xr awk 1 ,

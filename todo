@@ -87,15 +87,6 @@ edit_task() {
 	$EDITOR "${_file_todo}"
 }
 
-#list_tasks() {
-	#awk -v pat="$2" 'index($0, pat){printf "%4s %s\n", NR, $0}' "${_file_todo}" | sort -k2 | awk -v csR="${_reset}" -v csA="${_colourA}" -v csB="${_colourB}" -v csC="${_colourC}" -v csD="${_colourD}" '{ce=csR}/\(A\)/{cs=csA}/\(B\)/{cs=csB}/\(C\)/{cs=csC}/\(D\)/{cs=csD}/\(E\)/{cs=csR}{print cs$0ce}'
-#}
-	# This version does not currently support case insensitive matching.
-
-# Regular expressions conflict with the identifier + for projects. The above version of list_tasks() fixes this inside of todo(1). But if you want to manipulate the output later with regexp or even search for a term containing the + (e.g. a project like +work) you're gonna run into problems. The following version of list_tasks() is a standard implementation, meaning:
-# 1) todo(1) with this second list_tasks() will break when using + as an identifier for projects. USE A DIFFERENT IDENTIFIER.
-# 2) When using a different identifier and this second version of list_tasks(), you can manipulate your output with regexp all day long and also search for a full project term (e.g. a project like _work).
-
 list_tasks() {
 	awk -v arg="$2" \
 	-v csR="${_reset}" \
@@ -127,8 +118,7 @@ list_contexts() {
 }
 
 list_projects() {
-	contexts=$(grep -oh ' _[[:alnum:]]*' "${_file_todo}" | sort -u)
-	#contexts=$(grep -oh ' +[[:alnum:]]*' "${_file_todo}" | sort -u)
+	contexts=$(grep -oh ' +[[:alnum:]]*' "${_file_todo}" | sort -u)
 	for x in ${contexts} ; do
 		count=$(grep -c "${x}" "${_file_todo}")
 		printf "%4.4s" "${count}"
@@ -172,25 +162,25 @@ report_change() {
 
 today() {
 	due_today=$(grep -c " due:$(date +%F)" "${_file_todo}")
-	due_urgent=$(grep -c ' _urgent' "${_file_todo}")
+	due_urgent=$(grep -c ' +urgent' "${_file_todo}")
 	if [ "${due_today}" != 0 ] ; then
 		echo "---> Due today, $(date '+%d %B %Y')"
-		list_tasks "" "due:$(date +%F)" | grep -v ' _urgent'
+		list_tasks "" "due:$(date +%F)" | grep -v ' +urgent'
 		if [ "${due_urgent}" != 0 ] ; then
 			echo "---> Due urgently/overdue"
-			list_tasks "" " _urgent"
+			list_tasks "" " +urgent"
 		fi
 	elif [ "${due_today}" = 0 ] && [ "${due_urgent}" != 0 ] ; then
 		echo "---> Nothing due today, $(date '+%d %B %Y')"
 		echo "---> Due urgently/overdue"
-		list_tasks "" " _urgent"
+		list_tasks "" " +urgent"
 	else
 		echo "Nothing due today! ;)"
 	fi
 }
 
 usage() { cat << USAGE
-todo(1) version 0.8.3p1 - simple todo list manager.
+todo(1) version 0.9 - simple todo list manager.
 usage: ${0##*/}	[-v] [-d file] [-r file] [-t file] [-f directory]
 		[-p priority] command
 USAGE
