@@ -37,6 +37,9 @@ _reset="\033[0m"
 [ -n "$PAGER" ] || PAGER="less"
 
 TODODIR=${TODODIR:-${HOME}/.todo/}
+_file_todo=${_file_todo:-${TODODIR}/todo.txt}
+_file_done=${_file_done:-${TODODIR}/done.txt}
+_file_report=${_file_report:-${TODODIR}/report.txt}
 
 _verbose=0
 _priority=0
@@ -44,9 +47,9 @@ _priority=0
 create_task() {
 	shift 1
 	if [ "${_priority}" = 1 ] ; then
-		echo "(${_p}) $(date +%F)" "$@" >> "$TODODIR/todo.txt"
+		echo "(${_p}) $(date +%F)" "$@" >> "${_file_todo}"
 	else
-		echo "(A) $(date +%F)" "$@" >> "$TODODIR/todo.txt"
+		echo "(A) $(date +%F)" "$@" >> "${_file_todo}"
 	fi
 	if [ "${_verbose}" = 1 ] ; then
 		report_change "create"
@@ -57,22 +60,22 @@ append() {
 	if [ -n "$2" ] && [ -n "$3" ] ; then
 		_line="$2"
 		shift 2
-		sed -i "${_line}"'s/$/ '"$*"'/' "$TODODIR/todo.txt"
+		sed -i "${_line}"'s/$/ '"$*"'/' "${_file_todo}"
 		[ "${_verbose}" = 1 ] \
 			&& report_change "append" "${_line}"
 	fi
 }
 
 list_finished() {
-	$PAGER "$TODODIR/done.txt"
+	$PAGER "${_file_done}"
 }
 
 mark_done() {
-	_num_of_tasks="$(grep -c '' "$TODODIR"/todo.txt)"
+	_num_of_tasks="$(grep -c '' "${_file_todo}")"
 	if [ -n "$2" ] && [ "$2" -le "${_num_of_tasks}" ] ; then
 		arg="$2"
-		echo "x $(date +%F)" "$(sed -n "${arg}p" "$TODODIR/todo.txt")" >> "$TODODIR/done.txt"
-		sed -i "${arg}d" "$TODODIR/todo.txt"
+		echo "x $(date +%F)" "$(sed -n "${arg}p" "${_file_todo}")" >> "${_file_done}"
+		sed -i "${arg}d" "${_file_todo}"
 		[ "${_verbose}" = 1 ] \
 			&& report_change "mdone"
 	else
@@ -81,11 +84,11 @@ mark_done() {
 }
 
 edit_task() {
-	$EDITOR "$TODODIR/todo.txt"
+	$EDITOR "${_file_todo}"
 }
 
 #list_tasks() {
-	#awk -v pat="$2" 'index($0, pat){printf "%4s %s\n", NR, $0}' "$TODODIR/todo.txt" | sort -k2 | awk -v csR="${_reset}" -v csA="${_colourA}" -v csB="${_colourB}" -v csC="${_colourC}" -v csD="${_colourD}" '{ce=csR}/\(A\)/{cs=csA}/\(B\)/{cs=csB}/\(C\)/{cs=csC}/\(D\)/{cs=csD}/\(E\)/{cs=csR}{print cs$0ce}'
+	#awk -v pat="$2" 'index($0, pat){printf "%4s %s\n", NR, $0}' "${_file_todo}" | sort -k2 | awk -v csR="${_reset}" -v csA="${_colourA}" -v csB="${_colourB}" -v csC="${_colourC}" -v csD="${_colourD}" '{ce=csR}/\(A\)/{cs=csA}/\(B\)/{cs=csB}/\(C\)/{cs=csC}/\(D\)/{cs=csD}/\(E\)/{cs=csR}{print cs$0ce}'
 #}
 	# This version does not currently support case insensitive matching.
 
@@ -100,25 +103,34 @@ list_tasks() {
 	-v csB="${_colourB}" \
 	-v csC="${_colourC}" \
 	-v csD="${_colourD}" \
-	'{ce=csR}/\(A\)/{cs=csA}/\(B\)/{cs=csB}/\(C\)/{cs=csC}/\(D\)/{cs=csD}/\(E\)/{cs=csR} tolower($0) ~ arg {printf cs"%4s %s\n", NR, $0ce}' \
-	"$TODODIR/todo.txt" \
+	'function regexp(arg){
+		x=tolower(arg)
+		y=toupper(arg)
+		len=length(arg)
+		str=""
+		for(i = 1; i <= len ; ++i)
+			str=str"[" substr(x,i,1) substr(y,i,1) "]"
+			return str
+		}
+	{ce=csR}/\(A\)/{cs=csA}/\(B\)/{cs=csB}/\(C\)/{cs=csC}/\(D\)/{cs=csD}/\(E\)/{cs=csR} {if(match($0,regexp(arg))) printf cs"%4s %s\n", NR, $0ce}' \
+	"${_file_todo}" \
 	| sort -i -t '\(' -k2
 }
 
 list_contexts() {
-	projects=$(grep -oh ' @[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u)
+	projects=$(grep -oh ' @[[:alnum:]]*' "${_file_todo}" | sort -u)
 	for x in ${projects} ; do
-		count=$(grep -c "${x}" "$TODODIR/todo.txt")
+		count=$(grep -c "${x}" "${_file_todo}")
 		printf "%4.4s" "${count}"
 		echo " ${x}"
 	done
 }
 
 list_projects() {
-	contexts=$(grep -oh ' _[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u)
-	#contexts=$(grep -oh ' +[[:alnum:]]*' "$TODODIR/todo.txt" | sort -u)
+	contexts=$(grep -oh ' _[[:alnum:]]*' "${_file_todo}" | sort -u)
+	#contexts=$(grep -oh ' +[[:alnum:]]*' "${_file_todo}" | sort -u)
 	for x in ${contexts} ; do
-		count=$(grep -c "${x}" "$TODODIR/todo.txt")
+		count=$(grep -c "${x}" "${_file_todo}")
 		printf "%4.4s" "${count}"
 		echo " ${x}"
 	done
@@ -126,14 +138,16 @@ list_projects() {
 
 priority_change() {
 	if [ -n "$2" ] && [ -n "$3" ] ; then
-		sed -i "$2"'s/(.)/('"$3"')/' "$TODODIR/todo.txt"
+		sed -i "$2"'s/(.)/('"$3"')/' "${_file_todo}"
 		[ "${_verbose}" = 1 ] \
 			&& report_change "priority" "$2"
 	fi
 }
 
 report() {
-	echo "$(date +%FT%TZ) $(grep -c '' "$TODODIR/todo.txt") $(grep -c '' "$TODODIR/done.txt")" >> "$TODODIR/report.txt"
+	_nr_active=$(grep -c '' "${_file_todo}")
+	_nr_done=$(grep -c '' "${_file_done}")
+	echo "$(date +%FT%TZ) ${_nr_active} ${_nr_done}" >> "${_file_report}"
 	[ "${_verbose}" = 1 ] \
 		&& report_change "report"
 }
@@ -141,10 +155,10 @@ report() {
 report_change() {
 	case $1 in
 		append) _line="$2" ;;
-		create) _line="$(grep -c '' "$TODODIR"/todo.txt)" ;;
-		mdone) tail -1 "$TODODIR/done.txt" ;;
+		create) _line="$(grep -c '' "${_file_todo}")" ;;
+		mdone) tail -1 "${_file_done}" ;;
 		priority) _line="$2" ;;
-		report) tail -1 "$TODODIR/report.txt"
+		report) tail -1 "${_file_report}"
 	esac
 	awk -v line="${_line}" \
 	-v csR="${_reset}" \
@@ -153,12 +167,12 @@ report_change() {
 	-v csC="${_colourC}" \
 	-v csD="${_colourD}" \
 	'{ce=csR}/\(A\)/{cs=csA}/\(B\)/{cs=csB}/\(C\)/{cs=csC}/\(D\)/{cs=csD}/\(E\)/{cs=csR}{if(NR==line)printf "%4s %s\n", cs NR ce, cs $0 ce}' \
-	"$TODODIR/todo.txt"
+	"${_file_todo}"
 }
 
 today() {
-	due_today=$(grep -c " due:$(date +%F)" "$TODODIR"/todo.txt)
-	due_urgent=$(grep -c ' _urgent' "$TODODIR"/todo.txt)
+	due_today=$(grep -c " due:$(date +%F)" "${_file_todo}")
+	due_urgent=$(grep -c ' _urgent' "${_file_todo}")
 	if [ "${due_today}" != 0 ] ; then
 		echo "---> Due today, $(date '+%d %B %Y')"
 		list_tasks "" "due:$(date +%F)" | grep -v ' _urgent'
@@ -194,10 +208,6 @@ while getopts d:p:r:t:v arg; do
 	esac
 done
 shift $((OPTIND - 1))
-
-_file_todo=${_file_todo:-${TODODIR}/todo/todo.txt}
-_file_done=${_file_done:-${TODODIR}/todo/done.txt}
-_file_report=${_file_report:-${TODODIR}/todo/report.txt}
 
 case $1 in
 	a*) append "$@" ;;
