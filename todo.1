@@ -68,6 +68,9 @@ Show the list of existing entries. A keyword can be provided to only list matchi
 Note that the matching is case insensitive.
 .It Cm lc
 Show the list of existing contexts including amount of associated tasks.
+.It Cm ld
+Show the list of existing entries sorted on due date. The corresponding syntax is due:%F according to
+.Xr strftime 3 .
 .It Cm lp
 Show the list of existing projects including amount of associated tasks.
 .It Cm priority Ar tasknumber Ar priority
@@ -130,6 +133,11 @@ $ todo priority B 1
 Create task "example task" with priority C, but don't display it to standard output:
 .Bd -literal -offset indent
 $ todo -p C -q create example task
+.Ed
+.Pp
+Get an overview of the tasks due in the first days of August 2021:
+.Bd -literal -offset indent
+$ todo ld | grep due:2021-08-0
 .Ed
 .Sh HISTORY
 .Nm

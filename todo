@@ -118,6 +118,14 @@ list_contexts() {
 	done
 }
 
+list_due_dates() {
+	_due_dates=$(grep -oh ' due:[[:graph:]]*' "${_file_todo}" | sort -u)
+	for x in ${_due_dates} ; do
+		echo "---> Tasks ${x}"
+		list_tasks "" "${x}"
+	done
+}
+
 list_projects() {
 	_contexts=$(grep -oh ' +[[:alnum:]]*' "${_file_todo}" | sort -u)
 	for x in ${_contexts} ; do
@@ -210,6 +218,7 @@ case $1 in
 	f*) list_finished ;;
 	ls) list_tasks "$@" ;;
 	lc) list_contexts ;;
+	ld) list_due_dates ;;
 	lp) list_projects ;;
 	p*) priority_change "$@" ;;
 	r*) report ;;
