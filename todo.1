@@ -63,17 +63,17 @@ Mark the specified task as done.
 Edit todo.txt in $EDITOR.
 .It Cm finished
 Open done.txt in $PAGER.
-.It Cm ls Ar keyword
-Show the list of existing entries. A keyword can be provided to only list matching entries.
-Note that the matching is case insensitive.
 .It Cm lc
-Show the list of existing contexts including amount of associated tasks.
+Show the list of existing contexts including the amount of associated tasks.
 .It Cm ld Ar keyword
 Show the list of existing entries sorted on due date. The corresponding syntax is due:%F according to
 .Xr strftime 3 .
 This can be matched with a keyword.
 .It Cm lp
-Show the list of existing projects including amount of associated tasks.
+Show the list of existing projects including the amount of associated tasks.
+.It Cm ls Ar keyword
+Show the list of existing entries. A keyword can be provided to only list matching entries.
+Note that the matching is case insensitive.
 .It Cm priority Ar tasknumber Ar priority
 Change the priority of the specified task.
 .It Cm report
@@ -92,7 +92,7 @@ it is also possible to use
 $ todo c example task
 .Ed
 .Pp
-The only exceptions to this are ls, lc and lp.
+The only exceptions to this are lc, ld, lp and ls.
 .El
 .Sh ENVIRONMENT VARIABLES
 .Bl -tag -width "TODO_COLOUR_A" -compact
