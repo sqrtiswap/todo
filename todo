@@ -121,9 +121,10 @@ list_contexts() {
 list_due_dates() {
 	_due_dates=$(grep -oh ' due:[[:graph:]]*' "${_file_todo}" | sort -u)
 	for x in ${_due_dates} ; do
-		echo "---> Tasks ${x}"
-		list_tasks "" "${x}"
+		list_tasks "" "${x}" | grep "$2"
 	done
+	echo "---> Tasks without due dates:"
+	list_tasks "" "$2" | grep -v 'due:[[:graph:]]*'
 }
 
 list_projects() {
@@ -218,7 +219,7 @@ case $1 in
 	f*) list_finished ;;
 	ls) list_tasks "$@" ;;
 	lc) list_contexts ;;
-	ld) list_due_dates ;;
+	ld) list_due_dates "$@" ;;
 	lp) list_projects ;;
 	p*) priority_change "$@" ;;
 	r*) report ;;

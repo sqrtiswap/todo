@@ -14,7 +14,7 @@
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
-.Dd $Mdocdate: July 27 2021 $
+.Dd $Mdocdate: August 07 2021 $
 .Dt TODO 1
 .Os
 .Sh NAME
@@ -68,9 +68,10 @@ Show the list of existing entries. A keyword can be provided to only list matchi
 Note that the matching is case insensitive.
 .It Cm lc
 Show the list of existing contexts including amount of associated tasks.
-.It Cm ld
+.It Cm ld Ar keyword
 Show the list of existing entries sorted on due date. The corresponding syntax is due:%F according to
 .Xr strftime 3 .
+This can be matched with a keyword.
 .It Cm lp
 Show the list of existing projects including amount of associated tasks.
 .It Cm priority Ar tasknumber Ar priority
