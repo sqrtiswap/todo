@@ -123,8 +123,11 @@ list_due_dates() {
 	for x in ${_due_dates} ; do
 		list_tasks "" "${x}" | grep "$2"
 	done
-	echo "---> Tasks without due dates:"
-	list_tasks "" "$2" | grep -v 'due:[[:graph:]]*'
+	_no_due_dates=$(grep -cv ' due:[[:graph:]]*' "${_file_todo}")
+	if [ "${_no_due_dates}" -ne 0 ] ; then
+		echo "---> Tasks without due dates:"
+		list_tasks "" "$2" | grep -v ' due:[[:graph:]]*'
+	fi
 }
 
 list_projects() {
