@@ -48,12 +48,12 @@ _priority=0
 
 create_task() {
 	shift 1
-	if [ "${_priority}" = 1 ] ; then
+	if [ "${_priority}" -eq 1 ] ; then
 		echo "(${_p}) $(date +%F)" "$@" >> "${_file_todo}"
 	else
 		echo "(A) $(date +%F)" "$@" >> "${_file_todo}"
 	fi
-	[ "${_quiet}" = 1 ] \
+	[ "${_quiet}" -eq 1 ] \
 		|| report_change "create"
 }
 
@@ -62,7 +62,7 @@ append() {
 		_line="$2"
 		shift 2
 		sed -i "${_line}"'s/$/ '"$*"'/' "${_file_todo}"
-		[ "${_quiet}" = 1 ] \
+		[ "${_quiet}" -eq 1 ] \
 			|| report_change "append" "${_line}"
 	fi
 }
@@ -77,7 +77,7 @@ mark_done() {
 		arg="$2"
 		echo "x $(date +%F)" "$(sed -n "${arg}p" "${_file_todo}")" >> "${_file_done}"
 		sed -i "${arg}d" "${_file_todo}"
-		[ "${_quiet}" = 1 ] \
+		[ "${_quiet}" -eq 1 ] \
 			|| report_change "mdone"
 	else
 		echo "Can't mark task $2 as done. There are only ${_num_of_tasks} tasks."
@@ -86,6 +86,36 @@ mark_done() {
 
 edit_task() {
 	$EDITOR "${_file_todo}"
+}
+
+list_contexts() {
+	_projects=$(grep -oh ' @[[:alnum:]]*' "${_file_todo}" | sort -u)
+	for x in ${_projects} ; do
+		_count=$(grep -c "${x}" "${_file_todo}")
+		printf "%4.4s" "${_count}"
+		echo " ${x}"
+	done
+}
+
+list_due_dates() {
+	_due_dates=$(grep -oh ' due:[[:graph:]]*' "${_file_todo}" | sort -u)
+	for x in ${_due_dates} ; do
+		list_tasks "" "${x}" | grep "$2"
+	done
+	_no_due_dates=$(grep -cv ' due:[[:graph:]]*' "${_file_todo}")
+	if [ "${_no_due_dates}" -gt 0 ] ; then
+		echo "---> Tasks without due dates:"
+		list_tasks "" "$2" | grep -v ' due:[[:graph:]]*'
+	fi
+}
+
+list_projects() {
+	_contexts=$(grep -oh ' +[[:alnum:]]*' "${_file_todo}" | sort -u)
+	for x in ${_contexts} ; do
+		_count=$(grep -c "${x}" "${_file_todo}")
+		printf "%4.4s" "${_count}"
+		echo " ${x}"
+	done
 }
 
 list_tasks() {
@@ -109,40 +139,10 @@ list_tasks() {
 	| sort -i -t '\(' -k2
 }
 
-list_contexts() {
-	_projects=$(grep -oh ' @[[:alnum:]]*' "${_file_todo}" | sort -u)
-	for x in ${_projects} ; do
-		_count=$(grep -c "${x}" "${_file_todo}")
-		printf "%4.4s" "${_count}"
-		echo " ${x}"
-	done
-}
-
-list_due_dates() {
-	_due_dates=$(grep -oh ' due:[[:graph:]]*' "${_file_todo}" | sort -u)
-	for x in ${_due_dates} ; do
-		list_tasks "" "${x}" | grep "$2"
-	done
-	_no_due_dates=$(grep -cv ' due:[[:graph:]]*' "${_file_todo}")
-	if [ "${_no_due_dates}" -ne 0 ] ; then
-		echo "---> Tasks without due dates:"
-		list_tasks "" "$2" | grep -v ' due:[[:graph:]]*'
-	fi
-}
-
-list_projects() {
-	_contexts=$(grep -oh ' +[[:alnum:]]*' "${_file_todo}" | sort -u)
-	for x in ${_contexts} ; do
-		_count=$(grep -c "${x}" "${_file_todo}")
-		printf "%4.4s" "${_count}"
-		echo " ${x}"
-	done
-}
-
 priority_change() {
 	if [ -n "$2" ] && [ -n "$3" ] ; then
 		sed -i "$2"'s/(.)/('"$3"')/' "${_file_todo}"
-		[ "${_quiet}" = 1 ] \
+		[ "${_quiet}" -eq 1 ] \
 			|| report_change "priority" "$2"
 	fi
 }
@@ -151,7 +151,7 @@ report() {
 	_nr_active=$(grep -c '' "${_file_todo}")
 	_nr_done=$(grep -c '' "${_file_done}")
 	echo "$(date +%FT%TZ) ${_nr_active} ${_nr_done}" >> "${_file_report}"
-	[ "${_quiet}" = 1 ] \
+	[ "${_quiet}" -eq 1 ] \
 		|| report_change "report"
 }
 
@@ -176,24 +176,20 @@ report_change() {
 today() {
 	_due_today=$(grep -c " due:$(date +%F)" "${_file_todo}")
 	_due_urgent=$(grep -c ' +urgent' "${_file_todo}")
-	if [ "${_due_today}" != 0 ] ; then
+	if [ "${_due_today}" -gt 0 ] || [ "${_due_urgent}" -gt 0 ] ; then
 		echo "---> Due today, $(date '+%d %B %Y')"
 		list_tasks "" " due:$(date +%F)" | grep -v ' +urgent'
-		if [ "${_due_urgent}" != 0 ] ; then
+		if [ "${_due_urgent}" -gt 0 ] ; then
 			echo "---> Due urgently/overdue"
 			list_tasks "" " +urgent"
 		fi
-	elif [ "${_due_today}" = 0 ] && [ "${_due_urgent}" != 0 ] ; then
-		echo "---> Nothing due today, $(date '+%d %B %Y')"
-		echo "---> Due urgently/overdue"
-		list_tasks "" " +urgent"
 	else
 		echo "Nothing due today! ;)"
 	fi
 }
 
 usage() { cat << USAGE
-todo(1) version 0.9.1 - simple todo list manager.
+${0##*/}(1) version 0.9.1 - simple todo list manager.
 usage: ${0##*/}	[-q] [-d file] [-r file] [-t file]
 		[-p priority] command
 USAGE
@@ -220,10 +216,10 @@ case $1 in
 	d*) mark_done "$@" ;;
 	e*) edit_task "$@" ;;
 	f*) list_finished ;;
-	ls) list_tasks "$@" ;;
 	lc) list_contexts ;;
 	ld) list_due_dates "$@" ;;
 	lp) list_projects ;;
+	ls) list_tasks "$@" ;;
 	p*) priority_change "$@" ;;
 	r*) report ;;
 	t*) today ;;
