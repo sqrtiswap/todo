@@ -46,12 +46,14 @@ _file_report=${_file_report:-${TODODIR}/report.txt}
 _quiet=0
 _priority=0
 
+_date_today=$(date +%F)
+
 create_task() {
 	shift 1
 	if [ "${_priority}" -eq 1 ] ; then
-		echo "(${_p}) $(date +%F)" "$@" >> "${_file_todo}"
+		echo "(${_p}) ${_date_today}" "$@" >> "${_file_todo}"
 	else
-		echo "(A) $(date +%F)" "$@" >> "${_file_todo}"
+		echo "(A) ${_date_today}" "$@" >> "${_file_todo}"
 	fi
 	[ "${_quiet}" -eq 1 ] \
 		|| report_change "create"
@@ -75,7 +77,7 @@ mark_done() {
 	_num_of_tasks="$(grep -c '' "${_file_todo}")"
 	if [ -n "$2" ] && [ "$2" -le "${_num_of_tasks}" ] ; then
 		arg="$2"
-		echo "x $(date +%F)" "$(sed -n "${arg}p" "${_file_todo}")" >> "${_file_done}"
+		echo "x ${_date_today}" "$(sed -n "${arg}p" "${_file_todo}")" >> "${_file_done}"
 		sed -i "${arg}d" "${_file_todo}"
 		[ "${_quiet}" -eq 1 ] \
 			|| report_change "mdone"
@@ -174,14 +176,20 @@ report_change() {
 }
 
 today() {
-	_due_today=$(grep -c " due:$(date +%F)" "${_file_todo}")
-	_due_urgent=$(grep -c ' +urgent' "${_file_todo}")
-	if [ "${_due_today}" -gt 0 ] || [ "${_due_urgent}" -gt 0 ] ; then
+	_due_today=$(grep -c " due:${_date_today}" "${_file_todo}")
+	_due_dates=$(grep -oh ' due:[[:graph:]]*' "${_file_todo}" | cut -d ':' -f 2 | sort -u)
+	if [ "${_due_today}" -gt 0 ] || [ -n "${_due_dates}" ] ; then
 		echo "---> Due today, $(date '+%d %B %Y')"
-		list_tasks "" " due:$(date +%F)" | grep -v ' +urgent'
-		if [ "${_due_urgent}" -gt 0 ] ; then
+		list_tasks "" " due:${_date_today}"
+		if [ -n "${_due_dates}" ] ; then
 			echo "---> Due urgently/overdue"
-			list_tasks "" " +urgent"
+			for x in ${_due_dates} ; do
+				_unix_today=$(date +%s -d "${_date_today}")
+				_unix_x=$(date +%s -d "${x}")
+				if [ "${_unix_x}" -le "${_unix_today}" ] ; then
+					list_tasks "" "due:${x}"
+				fi
+			done
 		fi
 	else
 		echo "Nothing due today! ;)"
