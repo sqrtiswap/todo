@@ -186,7 +186,7 @@ today() {
 			for x in ${_due_dates} ; do
 				_unix_today=$(date +%s -d "${_date_today}")
 				_unix_x=$(date +%s -d "${x}")
-				if [ "${_unix_x}" -le "${_unix_today}" ] ; then
+				if [ "${_unix_x}" -lt "${_unix_today}" ] ; then
 					list_tasks "" "due:${x}"
 				fi
 			done
@@ -197,7 +197,7 @@ today() {
 }
 
 usage() { cat << USAGE
-${0##*/}(1) version 0.9.3 - simple todo list manager.
+${0##*/}(1) version 0.9.3p0 - simple todo list manager.
 usage: ${0##*/}	[-q] [-d file] [-r file] [-t file]
 		[-p priority] command
 USAGE
