@@ -180,14 +180,14 @@ today() {
 	_due_dates=$(grep -oh ' due:[[:graph:]]*' "${_file_todo}" | cut -d ':' -f 2 | sort -u)
 	if [ "${_due_today}" -gt 0 ] || [ -n "${_due_dates}" ] ; then
 		echo "---> Due today, $(date '+%d %B %Y')"
-		list_tasks "" " due:${_date_today}"
+		list_tasks "" " due:${_date_today}" | grep -i "$2"
 		if [ -n "${_due_dates}" ] ; then
 			echo "---> Due urgently/overdue"
 			for x in ${_due_dates} ; do
 				_unix_today=$(date +%s -d "${_date_today}")
 				_unix_x=$(date +%s -d "${x}")
 				if [ "${_unix_x}" -lt "${_unix_today}" ] ; then
-					list_tasks "" "due:${x}"
+					list_tasks "" "due:${x}" | grep -i "$2"
 				fi
 			done
 		fi
@@ -230,6 +230,6 @@ case $1 in
 	ls) list_tasks "$@" ;;
 	p*) priority_change "$@" ;;
 	r*) report ;;
-	t*) today ;;
+	t*) today "$@" ;;
 	*) usage
 esac

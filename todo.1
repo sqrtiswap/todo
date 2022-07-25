@@ -1,6 +1,6 @@
 .\"	$OpenBSD$
 .\"
-.\" Copyright (c) 2020, 2021 Alexander Möller <alexander.moeller@detmold.com>
+.\" Copyright (c) 2020-2022 Alexander Möller <alexander.moeller@detmold.com>
 .\"
 .\" Permission to use, copy, modify, and distribute this software for any
 .\" purpose with or without fee is hereby granted, provided that the above
@@ -78,8 +78,8 @@ Note that the matching is case insensitive.
 Change the priority of the specified task.
 .It Cm report
 Generate a report.
-.It Cm today
-Show the list of tasks due today as well as those past their due date.
+.It Cm today Ar keyword
+Show the list of tasks due today as well as those past their due date. If provided match this with a keyword.
 .El
 .Sh NOTES
 Most of the commands only depend on the first letter. So instead of using
