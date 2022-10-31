@@ -184,8 +184,8 @@ today() {
 		if [ -n "${_due_dates}" ] ; then
 			echo "---> Due urgently/overdue"
 			for x in ${_due_dates} ; do
-				_unix_today=$(date +%s -d "${_date_today}")
-				_unix_x=$(date +%s -d "${x}")
+				_unix_today=$(date -j -f "%F" "${_date_today}" "+%s")
+				_unix_x=$(date -j -f "%F" "${x}" "+%s")
 				if [ "${_unix_x}" -lt "${_unix_today}" ] ; then
 					list_tasks "" "due:${x}" | grep -i "$2"
 				fi
