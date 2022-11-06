@@ -12,7 +12,7 @@
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
-.Dd $Mdocdate: October 31 2021 $
+.Dd $Mdocdate: November 06 2022 $
 .Dt TODO 1
 .Os
 .Sh NAME
@@ -29,10 +29,12 @@
 .Sh DESCRIPTION
 .Nm
 is a simple todo list utilising only basic POSIX shell tools such as
+.Xr awk 1 ,
+.Xr date 1 ,
 .Xr echo 1 ,
-.Xr sed 1
+.Xr ed 1
 and
-.Xr awk 1 .
+.Xr printf 1 .
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
@@ -152,9 +154,10 @@ command used is identifier agnostic and the switch back was made.
 .Ed
 .Sh SEE ALSO
 .Xr awk 1 ,
+.Xr ed 1 ,
 .Xr grep 1 ,
 .Xr less 1 ,
-.Xr sed 1
+.Xr strftime 3
 .Sh AUTHOR
 .Nm
 was written by
