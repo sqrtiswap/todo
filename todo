@@ -46,7 +46,7 @@ _file_report=${_file_report:-${TODODIR}/report.txt}
 _quiet=0
 _priority=0
 
-_date_today=$(date +%F)
+_date_today=$(date +%Y-%m-%d)
 
 create_task() {
 	shift 1
@@ -152,7 +152,7 @@ priority_change() {
 report() {
 	_nr_active=$(grep -c '' "${_file_todo}")
 	_nr_done=$(grep -c '' "${_file_done}")
-	echo "$(date +%FT%TZ) ${_nr_active} ${_nr_done}" >> "${_file_report}"
+	echo "$(date +%Y-%m-%dT%TZ) ${_nr_active} ${_nr_done}" >> "${_file_report}"
 	[ "${_quiet}" -eq 1 ] \
 		|| report_change "report"
 }
