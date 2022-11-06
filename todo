@@ -78,7 +78,7 @@ mark_done() {
 	if [ -n "$2" ] && [ "$2" -le "${_num_of_tasks}" ] ; then
 		arg="$2"
 		echo "x ${_date_today}" "$(sed -n "${arg}p" "${_file_todo}")" >> "${_file_done}"
-		sed -i "${arg}d" "${_file_todo}"
+		printf '%s\n' "${arg}d" w | ed -s "${_file_todo}"
 		[ "${_quiet}" -eq 1 ] \
 			|| report_change "mdone"
 	else
