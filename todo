@@ -77,7 +77,7 @@ mark_done() {
 	_num_of_tasks="$(grep -c '' "${_file_todo}")"
 	if [ -n "$2" ] && [ "$2" -le "${_num_of_tasks}" ] ; then
 		arg="$2"
-		printf 'x %s %s\n' "$(date +%F)" "$(printf '%s\n' 5p q | ed -s todo.txt)" >> "${_file_done}"
+		printf 'x %s %s\n' "$(date +%F)" "$(printf '%s\n' "${arg}"p q | ed -s "${_file_todo}")" >> "${_file_done}"
 		printf '%s\n' "${arg}d" w | ed -s "${_file_todo}"
 		[ "${_quiet}" -eq 1 ] \
 			|| report_change "mdone"
@@ -201,7 +201,7 @@ today() {
 }
 
 usage() { cat << USAGE
-${0##*/}(1) version 0.9.5 - simple todo list manager.
+${0##*/}(1) version 0.9.5p0 - simple todo list manager.
 usage: ${0##*/}	[-q] [-d file] [-r file] [-t file]
 		[-p priority] command
 USAGE
