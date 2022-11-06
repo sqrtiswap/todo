@@ -63,7 +63,7 @@ append() {
 	if [ -n "$2" ] && [ -n "$3" ] ; then
 		_line="$2"
 		shift 2
-		sed -i "${_line}"'s/$/ '"$*"'/' "${_file_todo}"
+		printf '%s\n' "${_line}"s/$/" $*"/ w | ed -s "${_file_todo}"
 		[ "${_quiet}" -eq 1 ] \
 			|| report_change "append" "${_line}"
 	fi
@@ -143,7 +143,7 @@ list_tasks() {
 
 priority_change() {
 	if [ -n "$2" ] && [ -n "$3" ] ; then
-		sed -i "$2"'s/(.)/('"$3"')/' "${_file_todo}"
+		printf '%s\n' "$2"'s/(.)/('"$3"')/' w | ed -s "${_file_todo}"
 		[ "${_quiet}" -eq 1 ] \
 			|| report_change "priority" "$2"
 	fi
