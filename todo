@@ -201,7 +201,7 @@ today() {
 }
 
 usage() { cat << USAGE
-${0##*/}(1) version 0.9.4 - simple todo list manager.
+${0##*/}(1) version 0.9.5 - simple todo list manager.
 usage: ${0##*/}	[-q] [-d file] [-r file] [-t file]
 		[-p priority] command
 USAGE
