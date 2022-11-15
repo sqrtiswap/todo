@@ -12,7 +12,7 @@
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
-.Dd $Mdocdate: November 06 2022 $
+.Dd $Mdocdate: November 15 2022 $
 .Dt TODO 1
 .Os
 .Sh NAME
@@ -142,6 +142,16 @@ Get an overview of the tasks due in the first days of August 2021:
 .Bd -literal -offset indent
 $ todo ld | grep due:2021-08-0
 .Ed
+.Pp
+Check files in a non-standard location:
+.Bd -literal -offset indent
+$ TODODIR=/path/to/other/directory todo today
+.Pp
+$ todo -t /some/todo.txt -d /some/other/done.txt -r /another/report.txt ld
+.Ed
+.Pp
+These options are especially useful when put into an
+.Xr alias 1 .
 .Sh HISTORY
 .Nm
 is a complete rewrite from scratch of the popular todo.txt utility. The intention was to provide a simpler and POSIX compliant version.
