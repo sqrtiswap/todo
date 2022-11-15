@@ -190,8 +190,12 @@ today() {
 				trgt_y=$(echo "$x" | cut -d '-' -f 1)
 				trgt_m=$(echo "$x" | cut -d '-' -f 2)
 				trgt_d=$(echo "$x" | cut -d '-' -f 3)
-				if [ "${trgt_y}" -lt "${curr_y}" ] || [ "${trgt_m}" -lt "${curr_m}" ] || [ "${trgt_d}" -lt "${curr_d}" ] ; then
-					list_tasks "" "due:${x}" | grep -i "$2"
+				if [ "${trgt_y}" -le "${curr_y}" ] ; then
+					if [ "${trgt_m}" -lt "${curr_m}" ] ; then
+						list_tasks "" "due:${x}" | grep -i "$2"
+					elif [ "${trgt_m}" -eq "${curr_m}" ] && [ "${trgt_d}" -lt "${curr_d}" ] ; then
+						list_tasks "" "due:${x}" | grep -i "$2"
+					fi
 				fi
 			done
 		fi
@@ -201,7 +205,7 @@ today() {
 }
 
 usage() { cat << USAGE
-${0##*/}(1) version 0.9.5p0 - simple todo list manager.
+${0##*/}(1) version 0.9.5p1 - simple todo list manager.
 usage: ${0##*/}	[-q] [-d file] [-r file] [-t file]
 		[-p priority] command
 USAGE
