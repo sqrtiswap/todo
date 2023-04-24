@@ -104,7 +104,7 @@ list_due_dates() {
 	for x in ${_due_dates} ; do
 		list_tasks "" "${x}" | grep -i "$2"
 	done
-	_no_due_dates=$(grep -v ' due:[[:graph:]]*' "${_file_todo}" | grep -c "$2")
+	_no_due_dates=$(grep -v ' due:[[:graph:]]*' "${_file_todo}" | grep -ic "$2")
 	if [ "${_no_due_dates}" -gt 0 ] ; then
 		echo "---> Tasks without due dates:"
 		list_tasks "" "$2" | grep -v ' due:[[:graph:]]*'
@@ -208,7 +208,7 @@ today() {
 }
 
 usage() { cat << USAGE
-${0##*/}(1) version 0.9.5p3 - simple todo list manager.
+${0##*/}(1) version 0.9.5p4 - simple todo list manager.
 usage: ${0##*/}	[-q] [-d file] [-r file] [-t file]
 		[-p priority] command
 USAGE
