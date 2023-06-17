@@ -16,7 +16,7 @@ When I looked at the code I was shocked even more at some of the design decision
 By now this is also kind of a proof of principle to see if I can implement everything I want in a purely POSIX way.
 Hence I made some decisions that might themselves seem weird/shocking, e.g.:
 - The `-i` flag is an extension to `sed(1)` and therefore not allowed. `ed(1)` to the rescue! ;)
-- The `-j` in MacOS and `-d` in GNU `date(1)` are extension, so an ugly workaround is needed.
+- The `-j` in MacOS and `-d` in GNU `date(1)` are extensions, so an ugly workaround is needed.
 
 This also means: If it doesn't work for your obscure (but POSIX compliant) system, please tell me about it and I'll get it working.
 
@@ -31,7 +31,7 @@ This also means: If it doesn't work for your obscure (but POSIX compliant) syste
 ```shell
 make
 ```
-will move `todo` to `~/bin/` and the manpage to `~/man/man1/`.
+will move `todo` to `~/bin/` and the manpage to `~/man/man1/`. You may need to update your `MANPATH`.
 
 ## Removal
 
