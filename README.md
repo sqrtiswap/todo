@@ -6,9 +6,11 @@ todo.txt-cli replacement with a focus on portability
 
 ### Why?
 I happily used [todo.txt-cli](https://github.com/todotxt/todo.txt-cli) until 2019 when I started using OpenBSD.
-With OpenBSD by default using ksh(1) instead of bash(1) the script didn't work anymore - which of course isn't a big surprise.
-But even after installing bash(1) it still didn't work. Looking back I have no idea why that was the case but at that time it looked like todo.txt-cli was not just bash(1) specific but even specific to specific bash(1) versions/ports.
-When looking at the code I was shocked even more at some of the design decisions (not sure I would judge them so harshly nowadays but I did then) and therefore decided to write my own replacement with a focus on portability.
+With OpenBSD by default using `ksh(1)` instead of `bash(1)` the script didn't work anymore - which of course isn't a big surprise.
+
+But even after installing `bash(1)` it still didn't work. Looking back I have no idea why that was the case but at that time it looked like todo.txt-cli was not just `bash(1)` specific but even specific to specific `bash(1)` versions/ports.
+
+When I looked at the code I was shocked even more at some of the design decisions (I don't think I would judge it so harshly nowadays but I did then) and therefore decided to write my own replacement with a focus on portability.
 
 ### Why and how purely POSIX?
 By now this is also kind of a proof of principle to see if I can implement everything I want in a purely POSIX way.
@@ -29,7 +31,7 @@ This also means: If it doesn't work for your obscure (but POSIX compliant) syste
 ```shell
 make
 ```
-will move `todo` to `~/bin/` and the manpage to `/man/man1/`.
+will move `todo` to `~/bin/` and the manpage to `~/man/man1/`.
 
 ## Removal
 
