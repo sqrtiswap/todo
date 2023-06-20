@@ -24,7 +24,8 @@ This also means: If it doesn't work for your obscure (but POSIX compliant) syste
 - Not all features are available, only those I care about.
 - Some additional features exist because I care about them.
 - The features both scripts share may be behind different flags and commands. I just didn't care about keeping the same syntax.
-- Inspired by [Simpletask](https://github.com/mpcjanssen/simpletask-android) every task starts with the creation date (`+%F`) and may have a due date (`due:+%F`), e.g. `2023-06-17 (B) Do this thing @context +project due:2023-06-18`.
+- In the official [todo.txt format rules](https://github.com/todotxt/todo.txt#todotxt-format-rules) the creation date is an option, in `todo(1)` it's always added. This is also the case for the completion date as well as the priority.
+- Furthermore the order of priority and completion date in `done.txt` is reversed.
 
 ## Installation
 
