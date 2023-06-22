@@ -12,7 +12,7 @@
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
-.Dd $Mdocdate: November 15 2022 $
+.Dd $Mdocdate: June 21 2023 $
 .Dt TODO 1
 .Os
 .Sh NAME
@@ -20,6 +20,7 @@
 .Nd simple todo list
 .Sh SYNOPSIS
 .Nm
+.Op Fl b
 .Op Fl q
 .Op Fl d Ar file
 .Op Fl r Ar file
@@ -38,6 +39,8 @@ and
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
+.It Fl b
+Batch mode. Mark all tasks as done that match the keyword.
 .It Fl q
 Quiet mode. Perform the action, but don't display anything on standard output.
 Applies to append, create, done, priority, report.
@@ -59,6 +62,7 @@ Append an addition to the specified task.
 Add a new task.
 .It Cm done Ar tasknumber
 Mark the specified task as done.
+When used with -b then all tasks are marked as completed that match the following keyword.
 .It Cm edit
 Edit todo.txt in $EDITOR.
 .It Cm finished
@@ -141,6 +145,11 @@ $ todo -p C -q create example task
 Get an overview of the tasks due in the first days of August 2021:
 .Bd -literal -offset indent
 $ todo ld | grep due:2021-08-0
+.Ed
+.Pp
+Mark every task related to taxes as done:
+.Bd -literal -offset indent
+$ todo -b d taxes
 .Ed
 .Pp
 Check files in a non-standard location:
