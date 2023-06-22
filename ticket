@@ -14,11 +14,33 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+TODODIR=${TODODIR:-${HOME}/.todo/}
+_file_todo=${_file_todo:-${TODODIR}/todo.txt}
+_file_done=${_file_done:-${TODODIR}/done.txt}
+_file_report=${_file_report:-${TODODIR}/report.txt}
+
+_priority=0
+
 ticket_by_due_date() {
-	todo ld "$2" | grep -v '^--->' | head -1
+	todo -t "${_file_todo}" ld "$2" | grep -v '^--->' | head -1
 }
+
+fallback() {
+	todo -t "${_file_todo}" -d "${_file_done}" -r "${_file_report}" "$@"
+}
+
+while getopts d:r:t:p arg; do
+	case ${arg} in
+		d) _file_done="${OPTARG}" ;;
+		r) _file_report="${OPTARG}" ;;
+		t) _file_todo="${OPTARG}" ;;
+		p) _priority=1 && _p="${OPTARG}" ;;
+		*) todo usage
+	esac
+done
+shift $((OPTIND - 1))
 
 case $1 in
 	ld) ticket_by_due_date "$@" ;;
-	*) todo "$@"
+	*) fallback "$@"
 esac
