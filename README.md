@@ -44,5 +44,9 @@ make uninstall
 
 RTFM
 
+## Contributing
+
+Contributions are welcome and are accepted via pull requests. Please review the [guidelines](https://github.com/sqrtiswap/todo/blob/main/CONTRIBUTING.md) before submitting any pull requests.
+
 ## License
 [ISC](https://opensource.org/licenses/ISC)
