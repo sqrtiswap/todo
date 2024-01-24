@@ -47,7 +47,12 @@ RTFM
 
 ## Contributing
 
-Contributions are welcome and are accepted via pull requests. Please review the [guidelines](https://github.com/sqrtiswap/todo/blob/main/CONTRIBUTING.md) before submitting any pull requests.
+Contributions are welcome. Please review these guidelines beforehand.
+
+- Shell code should be strictly following the [POSIX standard](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html) without relying on syntax or commands of other shells. That's kinda the point of this project.
+- Send a coherent commit history, making sure each individual commit is meaningful.
+- You may need to [rebase](https://git-scm.com/book/en/v2/Git-Branching-Rebasing) to avoid merge conflicts.
+- If you are changing the behavior, you may need to update the manpage.
 
 ## Licence
 [ISC](https://opensource.org/licenses/ISC)
