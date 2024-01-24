@@ -52,9 +52,9 @@ _date_today=$(date +%Y-%m-%d)
 create_task() {
 	shift 1
 	if [ "${_priority}" -eq 1 ] ; then
-		echo "(${_p}) ${_date_today}" "$@" >> "${_file_todo}"
+		printf "%s\n" "(${_p}) ${_date_today} $*" >> "${_file_todo}"
 	else
-		echo "(A) ${_date_today}" "$@" >> "${_file_todo}"
+		printf "%s\n" "(A) ${_date_today} $*" >> "${_file_todo}"
 	fi
 	[ "${_quiet}" -eq 1 ] || report_change "create"
 }
@@ -86,7 +86,7 @@ select_done() {
 		if [ -n "$2" ] && [ "$2" -le "${_num_of_tasks}" ] ; then
 			mark_done "$2"
 		else
-			echo "Can't mark task $2 as done. There are only ${_num_of_tasks} tasks."
+			printf "%s\n" "Can't mark task $2 as done. There are only ${_num_of_tasks} tasks."
 		fi
 	fi
 }
@@ -106,8 +106,7 @@ list_contexts() {
 	_projects=$(grep -oh ' @[[:alnum:]_-]*' "${_file_todo}" | sort -u)
 	for x in ${_projects} ; do
 		_count=$(grep -c "${x}" "${_file_todo}")
-		printf "%4.4s" "${_count}"
-		echo " ${x}"
+		printf "%4.4s %s\n" "${_count}" "${x}"
 	done
 }
 
@@ -118,7 +117,7 @@ list_due_dates() {
 	done
 	_no_due_dates=$(grep -v ' due:[[:graph:]]*' "${_file_todo}" | grep -ic "$2")
 	if [ "${_no_due_dates}" -gt 0 ] ; then
-		echo "---> Tasks without due dates:"
+		printf "%s\n" "---> Tasks without due dates:"
 		list_tasks "" "$2" | grep -v ' due:[[:graph:]]*'
 	fi
 }
@@ -127,8 +126,7 @@ list_projects() {
 	_contexts=$(grep -oh ' +[[:alnum:]_-]*' "${_file_todo}" | sort -u)
 	for x in ${_contexts} ; do
 		_count=$(grep -c "${x}" "${_file_todo}")
-		printf "%4.4s" "${_count}"
-		echo " ${x}"
+		printf "%4.4s %s\n" "${_count}" "${x}"
 	done
 }
 
@@ -163,7 +161,7 @@ priority_change() {
 report() {
 	_nr_active=$(grep -c '' "${_file_todo}")
 	_nr_done=$(grep -c '' "${_file_done}")
-	echo "$(date +%Y-%m-%dT%TZ) ${_nr_active} ${_nr_done}" >> "${_file_report}"
+	printf "%s\n" "$(date +%Y-%m-%dT%TZ) ${_nr_active} ${_nr_done}" >> "${_file_report}"
 	[ "${_quiet}" -eq 1 ] || report_change "report"
 }
 
@@ -192,14 +190,14 @@ today() {
 	curr_m=$(date +%m)
 	curr_d=$(date +%d)
 	if [ "${_due_today}" -gt 0 ] || [ -n "${_due_dates}" ] ; then
-		echo "---> Due today, $(date '+%d %B %Y')"
+		printf "%s\n" "---> Due today, $(date '+%d %B %Y')"
 		list_tasks "" " due:${_date_today}" | grep -i "$2"
 		if [ -n "${_due_dates}" ] ; then
-			echo "---> Due urgently/overdue"
+			printf "%s\n" "---> Due urgently/overdue"
 			for x in ${_due_dates} ; do
-				trgt_y=$(echo "$x" | cut -d '-' -f 1)
-				trgt_m=$(echo "$x" | cut -d '-' -f 2)
-				trgt_d=$(echo "$x" | cut -d '-' -f 3)
+				trgt_y=$(printf "%s\n" "$x" | cut -d '-' -f 1)
+				trgt_m=$(printf "%s\n" "$x" | cut -d '-' -f 2)
+				trgt_d=$(printf "%s\n" "$x" | cut -d '-' -f 3)
 				if [ "${trgt_y}" -lt "${curr_y}" ] ; then
 					list_tasks "" "due:${x}" | grep -i "$2"
 				elif [ "${trgt_y}" -eq "${curr_y}" ] ; then
@@ -213,7 +211,7 @@ today() {
 		fi
 		exit 0
 	else
-		echo "Nothing due today! ;)"
+		printf "%s\n" "Nothing due today! ;)"
 	fi
 }
 
