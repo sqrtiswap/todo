@@ -26,14 +26,14 @@ This also means: If it doesn't work for your obscure (but POSIX compliant) syste
 - The features both scripts share may be behind different flags and commands. I just didn't care about keeping the same syntax. Sometimes a different command also made more sense, e.g. since I wanted to (in most cases) be able to use single-letter-commands as abbreviations for the full commands I changed `add` to `create` in order for `add` and `append` not to conflict. For more details see the documentation.
 - In the official [todo.txt format rules](https://github.com/todotxt/todo.txt#todotxt-format-rules) the creation date is an option, in `todo(1)` it's always added. This is also the case for the completion date as well as the priority.
 - Furthermore the order of priority and completion date in `done.txt` is reversed, e.g. an entry might be `x 2023-06-21 (C) 2023-06-20 Do this thing @context +project due:2023-06-21`.
-- `ticket(1)`: Show the very next task to do that matches the keyword.
 
 ## Installation
 
 ```shell
 make
 ```
-will move `todo` and `ticket` to `~/bin/` and their manpages to `~/man/man1/`. You may need to update your `MANPATH`.
+will move `todo` to `~/bin/` and the manpage to `~/man/man1/`.
+You may need to update your `MANPATH`.
 
 ## Removal
 
