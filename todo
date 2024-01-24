@@ -106,7 +106,7 @@ edit_task() {
 }
 
 list_contexts() {
-	_projects=$(grep -oh ' @[[:alnum:]]*' "${_file_todo}" | sort -u)
+	_projects=$(grep -oh ' @[[:alnum:]_-]*' "${_file_todo}" | sort -u)
 	for x in ${_projects} ; do
 		_count=$(grep -c "${x}" "${_file_todo}")
 		printf "%4.4s" "${_count}"
@@ -127,7 +127,7 @@ list_due_dates() {
 }
 
 list_projects() {
-	_contexts=$(grep -oh ' +[[:alnum:]]*' "${_file_todo}" | sort -u)
+	_contexts=$(grep -oh ' +[[:alnum:]_-]*' "${_file_todo}" | sort -u)
 	for x in ${_contexts} ; do
 		_count=$(grep -c "${x}" "${_file_todo}")
 		printf "%4.4s" "${_count}"
