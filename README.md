@@ -52,7 +52,8 @@ Contributions are welcome. Please review these guidelines beforehand.
 - Shell code should be strictly following the [POSIX standard](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html) without relying on syntax or commands of other shells. That's kinda the point of this project.
 - Send a coherent commit history, making sure each individual commit is meaningful.
 - You may need to [rebase](https://git-scm.com/book/en/v2/Git-Branching-Rebasing) to avoid merge conflicts.
-- If you are changing the behavior, you may need to update the manpage.
+- If you are changing the behavior, you may need to update the manpage. You may want to check the [mdoc(7) manpage](https://man.openbsd.org/mdoc.7) for the syntax.
+- Tools meant for inclusion in `contrib/` may be written in any language following whatever coding style you prefer.
 
 ## Licence
 [ISC](https://opensource.org/licenses/ISC)
