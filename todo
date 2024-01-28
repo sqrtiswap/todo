@@ -170,9 +170,9 @@ report_change() {
 	case $1 in
 		append) line="$2" ;;
 		create) line="$(grep -c '' "${file_todo}")" ;;
-		mdone) tail -1 "${file_done}" ;;
+		mdone) tail -1 "${file_done}" && exit 0 ;;
 		priority) line="$2" ;;
-		report) tail -1 "${file_report}"
+		report) tail -1 "${file_report}" && exit 0
 	esac
 	awk -v line="${line}" \
 	-v csR="${reset}" \
