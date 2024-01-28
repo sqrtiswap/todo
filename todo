@@ -93,7 +93,7 @@ select_done() {
 
 mark_done() {
 	arg="$1"
-	printf 'x %s %s\n' "$(date +%F)" "$(printf '%s\n' "${arg}"p q | ed -s "${file_todo}")" >> "${file_done}"
+	printf 'x %s %s\n' "$(date +%Y-%m-%d)" "$(printf '%s\n' "${arg}"p q | ed -s "${file_todo}")" >> "${file_done}"
 	printf '%s\n' "${arg}d" w | ed -s "${file_todo}"
 	[ "${quiet}" -eq 1 ] || report_change "mdone"
 }
