@@ -16,127 +16,127 @@
 
 set -e
 
-_reset="\033[0m"
+reset="\033[0m"
 
 [ -n "$TODO_COLOUR_A" ] \
-	&& _colourA="$TODO_COLOUR_A" \
-	|| _colourA="\033[31m"
+	&& colourA="$TODO_COLOUR_A" \
+	|| colourA="\033[31m"
 
 [ -n "$TODO_COLOUR_B" ] \
-	&& _colourB="$TODO_COLOUR_B" \
-	|| _colourB="\033[33m"
+	&& colourB="$TODO_COLOUR_B" \
+	|| colourB="\033[33m"
 
 [ -n "$TODO_COLOUR_C" ] \
-	&& _colourC="$TODO_COLOUR_C" \
-	|| _colourC="\033[32m"
+	&& colourC="$TODO_COLOUR_C" \
+	|| colourC="\033[32m"
 
 [ -n "$TODO_COLOUR_D" ] \
-	&& _colourD="$TODO_COLOUR_D" \
-	|| _colourD="\033[1;34m"
+	&& colourD="$TODO_COLOUR_D" \
+	|| colourD="\033[1;34m"
 
 [ -n "$EDITOR" ] || EDITOR="vi"
 
 [ -n "$PAGER" ] || PAGER="less"
 
 TODODIR=${TODODIR:-${HOME}/.todo/}
-_file_todo=${_file_todo:-${TODODIR}/todo.txt}
-_file_done=${_file_done:-${TODODIR}/done.txt}
-_file_report=${_file_report:-${TODODIR}/report.txt}
+file_todo=${file_todo:-${TODODIR}/todo.txt}
+file_done=${file_done:-${TODODIR}/done.txt}
+file_report=${file_report:-${TODODIR}/report.txt}
 
-_batch=0
-_quiet=0
-_priority=0
+batch=0
+quiet=0
+priority=0
 
-_date_today=$(date +%Y-%m-%d)
+date_today=$(date +%Y-%m-%d)
 
 create_task() {
 	shift 1
-	if [ "${_priority}" -eq 1 ] ; then
-		printf "%s\n" "(${_p}) ${_date_today} $*" >> "${_file_todo}"
+	if [ "${priority}" -eq 1 ] ; then
+		printf "%s\n" "(${p}) ${date_today} $*" >> "${file_todo}"
 	else
-		printf "%s\n" "(A) ${_date_today} $*" >> "${_file_todo}"
+		printf "%s\n" "(A) ${date_today} $*" >> "${file_todo}"
 	fi
-	[ "${_quiet}" -eq 1 ] || report_change "create"
+	[ "${quiet}" -eq 1 ] || report_change "create"
 }
 
 append() {
 	if [ -n "$2" ] && [ -n "$3" ] ; then
-		_line="$2"
+		line="$2"
 		shift 2
-		printf '%s\n' "${_line}"s/$/" $*"/ w | ed -s "${_file_todo}"
-		[ "${_quiet}" -eq 1 ] || report_change "append" "${_line}"
+		printf '%s\n' "${line}"s/$/" $*"/ w | ed -s "${file_todo}"
+		[ "${quiet}" -eq 1 ] || report_change "append" "${line}"
 	fi
 }
 
 list_finished() {
-	$PAGER "${_file_done}"
+	$PAGER "${file_done}"
 }
 
 select_done() {
-	if [ "${_batch}" -eq 1 ] ; then
-		_num_to_mdone=$(grep -ci "$2" "${_file_todo}")
+	if [ "${batch}" -eq 1 ] ; then
+		num_to_mdone=$(grep -ci "$2" "${file_todo}")
 		i=1
-		while [ "$i" -le "${_num_to_mdone}" ] ; do
-			_tasknum=$(grep -ni "$2" "${_file_todo}" | head -1 | cut -d : -f 1)
-			mark_done "${_tasknum}"
+		while [ "$i" -le "${num_to_mdone}" ] ; do
+			tasknum=$(grep -ni "$2" "${file_todo}" | head -1 | cut -d : -f 1)
+			mark_done "${tasknum}"
 			i=$((i+1))
 		done
 	else
-		_num_of_tasks="$(grep -c '' "${_file_todo}")"
-		if [ -n "$2" ] && [ "$2" -le "${_num_of_tasks}" ] ; then
+		num_of_tasks="$(grep -c '' "${file_todo}")"
+		if [ -n "$2" ] && [ "$2" -le "${num_of_tasks}" ] ; then
 			mark_done "$2"
 		else
-			printf "%s\n" "Can't mark task $2 as done. There are only ${_num_of_tasks} tasks."
+			printf "%s\n" "Can't mark task $2 as done. There are only ${num_of_tasks} tasks."
 		fi
 	fi
 }
 
 mark_done() {
 	arg="$1"
-	printf 'x %s %s\n' "$(date +%F)" "$(printf '%s\n' "${arg}"p q | ed -s "${_file_todo}")" >> "${_file_done}"
-	printf '%s\n' "${arg}d" w | ed -s "${_file_todo}"
-	[ "${_quiet}" -eq 1 ] || report_change "mdone"
+	printf 'x %s %s\n' "$(date +%F)" "$(printf '%s\n' "${arg}"p q | ed -s "${file_todo}")" >> "${file_done}"
+	printf '%s\n' "${arg}d" w | ed -s "${file_todo}"
+	[ "${quiet}" -eq 1 ] || report_change "mdone"
 }
 
 edit_task() {
-	$EDITOR "${_file_todo}"
+	$EDITOR "${file_todo}"
 }
 
 list_contexts() {
-	_projects=$(grep -oh ' @[[:alnum:]_-]*' "${_file_todo}" | sort -u)
-	for x in ${_projects} ; do
-		_count=$(grep -c "${x}" "${_file_todo}")
-		printf "%4.4s %s\n" "${_count}" "${x}"
+	projects=$(grep -oh ' @[[:alnum:]_-]*' "${file_todo}" | sort -u)
+	for x in ${projects} ; do
+		count=$(grep -c "${x}" "${file_todo}")
+		printf "%4.4s %s\n" "${count}" "${x}"
 	done
 }
 
 list_due_dates() {
-	_due_dates=$(grep -oh ' due:[[:graph:]]*' "${_file_todo}" | sort -u)
-	for x in ${_due_dates} ; do
+	due_dates=$(grep -oh ' due:[[:graph:]]*' "${file_todo}" | sort -u)
+	for x in ${due_dates} ; do
 		list_tasks "" "${x}" | grep -i "$2"
 	done
-	_no_due_dates=$(grep -v ' due:[[:graph:]]*' "${_file_todo}" | grep -ic "$2")
-	if [ "${_no_due_dates}" -gt 0 ] ; then
+	no_due_dates=$(grep -v ' due:[[:graph:]]*' "${file_todo}" | grep -ic "$2")
+	if [ "${no_due_dates}" -gt 0 ] ; then
 		printf "%s\n" "---> Tasks without due dates:"
 		list_tasks "" "$2" | grep -v ' due:[[:graph:]]*'
 	fi
 }
 
 list_projects() {
-	_contexts=$(grep -oh ' +[[:alnum:]_-]*' "${_file_todo}" | sort -u)
-	for x in ${_contexts} ; do
-		_count=$(grep -c "${x}" "${_file_todo}")
-		printf "%4.4s %s\n" "${_count}" "${x}"
+	contexts=$(grep -oh ' +[[:alnum:]_-]*' "${file_todo}" | sort -u)
+	for x in ${contexts} ; do
+		count=$(grep -c "${x}" "${file_todo}")
+		printf "%4.4s %s\n" "${count}" "${x}"
 	done
 }
 
 list_tasks() {
 	awk -v arg="$2" \
-	-v csR="${_reset}" \
-	-v csA="${_colourA}" \
-	-v csB="${_colourB}" \
-	-v csC="${_colourC}" \
-	-v csD="${_colourD}" \
+	-v csR="${reset}" \
+	-v csA="${colourA}" \
+	-v csB="${colourB}" \
+	-v csC="${colourC}" \
+	-v csD="${colourD}" \
 	'function regexp(arg){
 		x=tolower(arg)
 		y=toupper(arg)
@@ -148,55 +148,55 @@ list_tasks() {
 		}
 	{ce=csR}/\(A\)/{cs=csA}/\(B\)/{cs=csB}/\(C\)/{cs=csC}/\(D\)/{cs=csD}/\([E-Z]\)/{cs=csR}
 	{if(match($0,regexp(arg))) printf cs"%4s %s\n", NR, $0ce}' \
-	"${_file_todo}" \
+	"${file_todo}" \
 	| sort -k3
 }
 
 priority_change() {
 	if [ -n "$2" ] && [ -n "$3" ] ; then
-		printf '%s\n' "$2"'s/(.)/('"$3"')/' w | ed -s "${_file_todo}"
-		[ "${_quiet}" -eq 1 ] || report_change "priority" "$2"
+		printf '%s\n' "$2"'s/(.)/('"$3"')/' w | ed -s "${file_todo}"
+		[ "${quiet}" -eq 1 ] || report_change "priority" "$2"
 	fi
 }
 
 report() {
-	_nr_active=$(grep -c '' "${_file_todo}")
-	_nr_done=$(grep -c '' "${_file_done}")
-	printf "%s\n" "$(date +%Y-%m-%dT%TZ) ${_nr_active} ${_nr_done}" >> "${_file_report}"
-	[ "${_quiet}" -eq 1 ] || report_change "report"
+	nr_active=$(grep -c '' "${file_todo}")
+	nr_done=$(grep -c '' "${file_done}")
+	printf "%s\n" "$(date +%Y-%m-%dT%TZ) ${nr_active} ${nr_done}" >> "${file_report}"
+	[ "${quiet}" -eq 1 ] || report_change "report"
 }
 
 report_change() {
 	case $1 in
-		append) _line="$2" ;;
-		create) _line="$(grep -c '' "${_file_todo}")" ;;
-		mdone) tail -1 "${_file_done}" ;;
-		priority) _line="$2" ;;
-		report) tail -1 "${_file_report}"
+		append) line="$2" ;;
+		create) line="$(grep -c '' "${file_todo}")" ;;
+		mdone) tail -1 "${file_done}" ;;
+		priority) line="$2" ;;
+		report) tail -1 "${file_report}"
 	esac
-	awk -v line="${_line}" \
-	-v csR="${_reset}" \
-	-v csA="${_colourA}" \
-	-v csB="${_colourB}" \
-	-v csC="${_colourC}" \
-	-v csD="${_colourD}" \
+	awk -v line="${line}" \
+	-v csR="${reset}" \
+	-v csA="${colourA}" \
+	-v csB="${colourB}" \
+	-v csC="${colourC}" \
+	-v csD="${colourD}" \
 	'{ce=csR}/\(A\)/{cs=csA}/\(B\)/{cs=csB}/\(C\)/{cs=csC}/\(D\)/{cs=csD}/\([E-Z]\)/{cs=csR}
 	{if(NR==line)printf "%4s %s\n", cs NR ce, cs $0 ce}' \
-	"${_file_todo}"
+	"${file_todo}"
 }
 
 today() {
-	_due_today=$(grep -c " due:${_date_today}" "${_file_todo}")
-	_due_dates=$(grep -oh ' due:[[:graph:]]*' "${_file_todo}" | cut -d ':' -f 2 | sort -u)
+	due_today=$(grep -c " due:${date_today}" "${file_todo}")
+	due_dates=$(grep -oh ' due:[[:graph:]]*' "${file_todo}" | cut -d ':' -f 2 | sort -u)
 	curr_y=$(date +%Y)
 	curr_m=$(date +%m)
 	curr_d=$(date +%d)
-	if [ "${_due_today}" -gt 0 ] || [ -n "${_due_dates}" ] ; then
+	if [ "${due_today}" -gt 0 ] || [ -n "${due_dates}" ] ; then
 		printf "%s\n" "---> Due today, $(date '+%d %B %Y')"
-		list_tasks "" " due:${_date_today}" | grep -i "$2"
-		if [ -n "${_due_dates}" ] ; then
+		list_tasks "" " due:${date_today}" | grep -i "$2"
+		if [ -n "${due_dates}" ] ; then
 			printf "%s\n" "---> Due urgently/overdue"
-			for x in ${_due_dates} ; do
+			for x in ${due_dates} ; do
 				trgt_y=$(printf "%s\n" "$x" | cut -d '-' -f 1)
 				trgt_m=$(printf "%s\n" "$x" | cut -d '-' -f 2)
 				trgt_d=$(printf "%s\n" "$x" | cut -d '-' -f 3)
@@ -229,12 +229,12 @@ set +e
 
 while getopts bd:r:t:p:q arg ; do
 	case ${arg} in
-		b) _batch=1 ;;
-		d) _file_done="${OPTARG}" ;;
-		r) _file_report="${OPTARG}" ;;
-		t) _file_todo="${OPTARG}" ;;
-		p) _priority=1 && _p="${OPTARG}" ;;
-		q) _quiet=1 ;;
+		b) batch=1 ;;
+		d) file_done="${OPTARG}" ;;
+		r) file_report="${OPTARG}" ;;
+		t) file_todo="${OPTARG}" ;;
+		p) priority=1 && p="${OPTARG}" ;;
+		q) quiet=1 ;;
 		*) usage
 	esac
 done

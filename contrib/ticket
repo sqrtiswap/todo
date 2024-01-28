@@ -15,26 +15,26 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 TODODIR=${TODODIR:-${HOME}/.todo/}
-_file_todo=${_file_todo:-${TODODIR}/todo.txt}
-_file_done=${_file_done:-${TODODIR}/done.txt}
-_file_report=${_file_report:-${TODODIR}/report.txt}
+file_todo=${file_todo:-${TODODIR}/todo.txt}
+file_done=${file_done:-${TODODIR}/done.txt}
+file_report=${file_report:-${TODODIR}/report.txt}
 
-_priority=0
+priority=0
 
 ticket_by_due_date() {
-	todo -t "${_file_todo}" ld "$2" | grep -v '^--->' | head -1
+	todo -t "${file_todo}" ld "$2" | grep -v '^--->' | head -1
 }
 
 fallback() {
-	todo -t "${_file_todo}" -d "${_file_done}" -r "${_file_report}" "$@"
+	todo -t "${file_todo}" -d "${file_done}" -r "${file_report}" "$@"
 }
 
 while getopts d:r:t:p arg; do
 	case ${arg} in
-		d) _file_done="${OPTARG}" ;;
-		r) _file_report="${OPTARG}" ;;
-		t) _file_todo="${OPTARG}" ;;
-		p) _priority=1 && _p="${OPTARG}" ;;
+		d) file_done="${OPTARG}" ;;
+		r) file_report="${OPTARG}" ;;
+		t) file_todo="${OPTARG}" ;;
+		p) priority=1 && p="${OPTARG}" ;;
 		*) todo usage
 	esac
 done
