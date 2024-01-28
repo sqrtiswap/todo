@@ -56,7 +56,7 @@ create_task() {
 	else
 		printf "%s\n" "(A) ${date_today} $*" >> "${file_todo}"
 	fi
-	[ "${quiet}" -eq 1 ] || report_change "create"
+	[ "${quiet}" -eq 1 ] || report_switcher "create"
 }
 
 append() {
@@ -64,7 +64,7 @@ append() {
 		line="$2"
 		shift 2
 		printf '%s\n' "${line}"s/$/" $*"/ w | ed -s "${file_todo}"
-		[ "${quiet}" -eq 1 ] || report_change "append" "${line}"
+		[ "${quiet}" -eq 1 ] || report_switcher "append" "${line}"
 	fi
 }
 
@@ -95,7 +95,7 @@ mark_done() {
 	arg="$1"
 	printf 'x %s %s\n' "$(date +%Y-%m-%d)" "$(printf '%s\n' "${arg}"p q | ed -s "${file_todo}")" >> "${file_done}"
 	printf '%s\n' "${arg}d" w | ed -s "${file_todo}"
-	[ "${quiet}" -eq 1 ] || report_change "mdone"
+	[ "${quiet}" -eq 1 ] || report_switcher "mdone"
 }
 
 edit_task() {
@@ -155,7 +155,7 @@ list_tasks() {
 priority_change() {
 	if [ -n "$2" ] && [ -n "$3" ] ; then
 		printf '%s\n' "$2"'s/(.)/('"$3"')/' w | ed -s "${file_todo}"
-		[ "${quiet}" -eq 1 ] || report_change "priority" "$2"
+		[ "${quiet}" -eq 1 ] || report_switcher "priority" "$2"
 	fi
 }
 
@@ -163,17 +163,20 @@ report() {
 	nr_active=$(grep -c '' "${file_todo}")
 	nr_done=$(grep -c '' "${file_done}")
 	printf "%s\n" "$(date +%Y-%m-%dT%TZ) ${nr_active} ${nr_done}" >> "${file_report}"
-	[ "${quiet}" -eq 1 ] || report_change "report"
+	[ "${quiet}" -eq 1 ] || report_switcher "report"
 }
 
-report_change() {
+report_switcher() {
 	case $1 in
-		append) line="$2" ;;
-		create) line="$(grep -c '' "${file_todo}")" ;;
-		mdone) tail -1 "${file_done}" && exit 0 ;;
-		priority) line="$2" ;;
-		report) tail -1 "${file_report}" && exit 0
+		append) line="$2" report_coloured ;;
+		create) line="$(grep -c '' "${file_todo}")" report_coloured ;;
+		mdone) tail -1 "${file_done}" ;;
+		priority) line="$2" report_coloured ;;
+		report) tail -1 "${file_report}"
 	esac
+}
+
+report_coloured() {
 	awk -v line="${line}" \
 	-v csR="${reset}" \
 	-v csA="${colourA}" \
