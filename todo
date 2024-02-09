@@ -106,7 +106,7 @@ list_contexts() {
 	projects=$(grep -oh ' @[[:alnum:]_-]*' "${file_todo}" | sort -u)
 	for x in ${projects} ; do
 		count=$(grep -c "${x}" "${file_todo}")
-		printf "%4.4s %s\n" "${count}" "${x}"
+		printf "%5.5s %s\n" "${count}" "${x}"
 	done
 }
 
@@ -117,7 +117,7 @@ list_due_dates() {
 	done
 	no_due_dates=$(grep -v ' due:[[:graph:]]*' "${file_todo}" | grep -ic "$2")
 	if [ "${no_due_dates}" -gt 0 ] ; then
-		printf "%s\n" "---> Tasks without due dates:"
+		printf "%s\n" "----> Tasks without due dates:"
 		list_tasks "" "$2" | grep -v ' due:[[:graph:]]*'
 	fi
 }
@@ -126,7 +126,7 @@ list_projects() {
 	contexts=$(grep -oh ' +[[:alnum:]_-]*' "${file_todo}" | sort -u)
 	for x in ${contexts} ; do
 		count=$(grep -c "${x}" "${file_todo}")
-		printf "%4.4s %s\n" "${count}" "${x}"
+		printf "%5.5s %s\n" "${count}" "${x}"
 	done
 }
 
@@ -147,7 +147,7 @@ list_tasks() {
 			return str
 		}
 	{ce=csR}/\(A\)/{cs=csA}/\(B\)/{cs=csB}/\(C\)/{cs=csC}/\(D\)/{cs=csD}/\([E-Z]\)/{cs=csR}
-	{if(match($0,regexp(arg))) printf cs"%4s %s\n", NR, $0ce}' \
+	{if(match($0,regexp(arg))) printf cs"%5s %s\n", NR, $0ce}' \
 	"${file_todo}" \
 	| sort -k3
 }
@@ -184,7 +184,7 @@ report_coloured() {
 	-v csC="${colourC}" \
 	-v csD="${colourD}" \
 	'{ce=csR}/\(A\)/{cs=csA}/\(B\)/{cs=csB}/\(C\)/{cs=csC}/\(D\)/{cs=csD}/\([E-Z]\)/{cs=csR}
-	{if(NR==line)printf "%4s %s\n", cs NR ce, cs $0 ce}' \
+	{if(NR==line)printf "%5s %s\n", cs NR ce, cs $0 ce}' \
 	"${file_todo}"
 }
 
@@ -195,10 +195,10 @@ today() {
 	curr_m=$(date +%m)
 	curr_d=$(date +%d)
 	if [ "${due_today}" -gt 0 ] || [ -n "${due_dates}" ] ; then
-		printf "%s\n" "---> Due today, $(date '+%d %B %Y')"
+		printf "%s\n" "----> Due today, $(date '+%d %B %Y')"
 		list_tasks "" " due:${date_today}" | grep -i "$2"
 		if [ -n "${due_dates}" ] ; then
-			printf "%s\n" "---> Due urgently/overdue"
+			printf "%s\n" "----> Due urgently/overdue"
 			for x in ${due_dates} ; do
 				trgt_y=$(printf "%s\n" "$x" | cut -d '-' -f 1)
 				trgt_m=$(printf "%s\n" "$x" | cut -d '-' -f 2)

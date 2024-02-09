@@ -22,7 +22,7 @@ file_report=${file_report:-${TODODIR}/report.txt}
 priority=0
 
 ticket_by_due_date() {
-	todo -t "${file_todo}" ld "$2" | grep -v '^--->' | head -1
+	todo -t "${file_todo}" ld "$2" | grep -v '^---->' | head -1
 }
 
 fallback() {
