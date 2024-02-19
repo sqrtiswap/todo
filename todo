@@ -47,10 +47,7 @@ batch=0
 quiet=0
 priority=0
 
-curr_y=$(date +%Y)
-curr_m=$(date +%m)
-curr_d=$(date +%d)
-date_today="$curr_y-$curr_m-$curr_d"
+date_today=$(date +%Y-%m-%d)
 
 create_task() {
 	shift 1
