@@ -195,30 +195,19 @@ today() {
 	n=0
 	due_dates=$(grep -oh ' due:[[:graph:]]*' "${file_todo}" | cut -d ':' -f 2 | sort -u)
 	if [ -n "${due_dates}" ] ; then
-		printf "%s\n" "----> Due urgently/overdue"
 		for x in ${due_dates} ; do
-			trgt_y=$(printf "%s\n" "$x" | cut -d '-' -f 1)
-			trgt_m=$(printf "%s\n" "$x" | cut -d '-' -f 2)
-			trgt_d=$(printf "%s\n" "$x" | cut -d '-' -f 3)
-			if [ "${trgt_y}" -lt "${curr_y}" ] ; then
-				list_tasks "" "due:${x}" | grep -i "$2"
+			if expr "$x" \< "$date_today" > /dev/null ; then
 				n=$((n+1))
-			elif [ "${trgt_y}" -eq "${curr_y}" ] ; then
-				if [ "${trgt_m}" -lt "${curr_m}" ] ; then
-					list_tasks "" "due:${x}" | grep -i "$2"
-					n=$((n+1))
-				elif [ "${trgt_m}" -eq "${curr_m}" ] && [ "${trgt_d}" -lt "${curr_d}" ] ; then
-					list_tasks "" "due:${x}" | grep -i "$2"
-					n=$((n+1))
-				fi
+				[ "$n" -eq 1 ] && printf "%s\n" "----> Due urgently/overdue"
+				list_tasks "" "due:${x}" | grep -i "$2"
 			fi
 		done
 	fi
 	due_today=$(grep -c " due:${date_today}" "${file_todo}")
 	if [ "${due_today}" -gt 0 ] ; then
+		n=$((n+1))
 		printf "%s\n" "----> Due today, $(date '+%d %B %Y')"
 		list_tasks "" " due:${date_today}" | grep -i "$2"
-		n=$((n+1))
 	fi
 	if [ "$n" -eq 0 ] ; then
 		printf "%s\n" "Nothing due today! ;)"
