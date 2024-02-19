@@ -47,7 +47,10 @@ batch=0
 quiet=0
 priority=0
 
-date_today=$(date +%Y-%m-%d)
+curr_y=$(date +%Y)
+curr_m=$(date +%m)
+curr_d=$(date +%d)
+date_today="$curr_y-$curr_m-$curr_d"
 
 create_task() {
 	shift 1
@@ -93,7 +96,7 @@ select_done() {
 
 mark_done() {
 	arg="$1"
-	printf 'x %s %s\n' "$(date +%Y-%m-%d)" "$(printf '%s\n' "${arg}"p q | ed -s "${file_todo}")" >> "${file_done}"
+	printf 'x %s %s\n' "$date_today" "$(printf '%s\n' "${arg}"p q | ed -s "${file_todo}")" >> "${file_done}"
 	printf '%s\n' "${arg}d" w | ed -s "${file_todo}"
 	[ "${quiet}" -eq 1 ] || report_switcher "mdone"
 }
@@ -191,9 +194,6 @@ report_coloured() {
 today() {
 	due_today=$(grep -c " due:${date_today}" "${file_todo}")
 	due_dates=$(grep -oh ' due:[[:graph:]]*' "${file_todo}" | cut -d ':' -f 2 | sort -u)
-	curr_y=$(date +%Y)
-	curr_m=$(date +%m)
-	curr_d=$(date +%d)
 	if [ "${due_today}" -gt 0 ] || [ -n "${due_dates}" ] ; then
 		printf "%s\n" "----> Due today, $(date '+%d %B %Y')"
 		list_tasks "" " due:${date_today}" | grep -i "$2"
