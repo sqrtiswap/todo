@@ -14,6 +14,9 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+# PURPOSE: Limit the output of todo(1) to at most one task in cases when showing
+#          everything that's due might be overwhelming.
+
 TODODIR=${TODODIR:-${HOME}/.todo/}
 file_todo=${file_todo:-${TODODIR}/todo.txt}
 file_done=${file_done:-${TODODIR}/done.txt}
