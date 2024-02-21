@@ -53,7 +53,7 @@ Contributions are welcome. Please review these guidelines beforehand.
 - Send a coherent commit history, making sure each individual commit is meaningful.
 - You may need to [rebase](https://git-scm.com/book/en/v2/Git-Branching-Rebasing) to avoid merge conflicts.
 - If you are changing the behavior, you may need to update the manpage. You may want to check the [mdoc(7) manpage](https://man.openbsd.org/mdoc.7) for the syntax.
-- Tools meant for inclusion in `contrib/` may be written in any language following whatever coding style you prefer.
+- Tools meant for inclusion in `contrib/` may be written in any language following whatever coding style you prefer. But you might want to include a comment about the purpose of your tool, especially if the code is complex and difficult to understand at a glance.
 
 ## Licence
 [ISC](https://opensource.org/licenses/ISC)
