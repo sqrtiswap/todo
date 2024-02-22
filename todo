@@ -14,6 +14,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+# Error out when something goes wrong before corrupting one of the files.
 set -e
 
 reset="\033[0m"
@@ -50,7 +51,7 @@ priority=0
 date_today=$(date +%Y-%m-%d)
 
 create_task() {
-	shift 1
+	shift 1 # remove command from $@
 	if [ "${priority}" -eq 1 ] ; then
 		printf "%s\n" "(${p}) ${date_today} $*" >> "${file_todo}"
 	else
@@ -62,7 +63,7 @@ create_task() {
 append() {
 	if [ -n "$2" ] && [ -n "$3" ] ; then
 		line="$2"
-		shift 2
+		shift 2 # remove command and line number from $*
 		printf '%s\n' "${line}"s/$/" $*"/ w | ed -s "${file_todo}"
 		[ "${quiet}" -eq 1 ] || report_switcher "append" "${line}"
 	fi
@@ -73,6 +74,10 @@ list_finished() {
 }
 
 select_done() {
+	# Select the tasks that should be marked as completed: In batch mode this
+	# iterates through the matches by name since the linenumber changes after
+	# each time a task is marked as done. In normal mode it just checks that the
+	# provided line number actually corresponds to an existing task.
 	if [ "${batch}" -eq 1 ] ; then
 		num_to_mdone=$(grep -ci "$2" "${file_todo}")
 		i=1
@@ -92,6 +97,7 @@ select_done() {
 }
 
 mark_done() {
+	# Mark tasks as done. This is never called directly, only via select_done().
 	arg="$1"
 	printf 'x %s %s\n' "$date_today" "$(printf '%s\n' "${arg}"p q | ed -s "${file_todo}")" >> "${file_done}"
 	printf '%s\n' "${arg}d" w | ed -s "${file_todo}"
@@ -103,6 +109,7 @@ edit_task() {
 }
 
 list_contexts() {
+	# List all contexts and count how many tasks have each context.
 	projects=$(grep -oh ' @[[:alnum:]_-]*' "${file_todo}" | sort -u)
 	for x in ${projects} ; do
 		count=$(grep -c "${x}" "${file_todo}")
@@ -111,10 +118,12 @@ list_contexts() {
 }
 
 list_due_dates() {
+	# List tasks sorted by their due dates.
 	due_dates=$(grep -oh ' due:[[:graph:]]*' "${file_todo}" | sort -u)
 	for x in ${due_dates} ; do
 		list_tasks "" "${x}" | grep -i "$2"
 	done
+	# List remaining tasks that don't have a due date.
 	no_due_dates=$(grep -v ' due:[[:graph:]]*' "${file_todo}" | grep -ic "$2")
 	if [ "${no_due_dates}" -gt 0 ] ; then
 		printf "%s\n" "----> Tasks without due dates:"
@@ -123,6 +132,7 @@ list_due_dates() {
 }
 
 list_projects() {
+	# List all projects and count how many tasks are part of a each project.
 	contexts=$(grep -oh ' +[[:alnum:]_-]*' "${file_todo}" | sort -u)
 	for x in ${contexts} ; do
 		count=$(grep -c "${x}" "${file_todo}")
@@ -131,6 +141,9 @@ list_projects() {
 }
 
 list_tasks() {
+	# List tasks sorted first by priority, then alphanumerically.
+	# regexp(arg) takes care of case-insensitive matching by checking for every
+	# possible combination of upper and lower case characters in the keyword.
 	awk -v arg="$2" \
 	-v csR="${reset}" \
 	-v csA="${colourA}" \
@@ -153,6 +166,7 @@ list_tasks() {
 }
 
 priority_change() {
+	# Change priority of task with line number $2 to $3.
 	if [ -n "$2" ] && [ -n "$3" ] ; then
 		printf '%s\n' "$2"'s/(.)/('"$3"')/' w | ed -s "${file_todo}"
 		[ "${quiet}" -eq 1 ] || report_switcher "priority" "$2"
@@ -160,6 +174,7 @@ priority_change() {
 }
 
 report() {
+	# Create report.txt line: <timestamp> <todo.txt lines> <done.txt lines>
 	nr_active=$(grep -c '' "${file_todo}")
 	nr_done=$(grep -c '' "${file_done}")
 	printf "%s\n" "$(date +%Y-%m-%dT%TZ) ${nr_active} ${nr_done}" >> "${file_report}"
@@ -167,6 +182,8 @@ report() {
 }
 
 report_switcher() {
+	# Called from the other functions to write the appropriate output when a
+	# change to one or more of the files was made.
 	case $1 in
 		append) line="$2" report_coloured ;;
 		create) line="$(grep -c '' "${file_todo}")" report_coloured ;;
@@ -177,6 +194,7 @@ report_switcher() {
 }
 
 report_coloured() {
+	# Provide coloured output, only ever called by report_switcher().
 	awk -v line="${line}" \
 	-v csR="${reset}" \
 	-v csA="${colourA}" \
@@ -189,7 +207,10 @@ report_coloured() {
 }
 
 today() {
+	# Show only tasks that are either overdue or due today.
 	n=0
+	# List overdue tasks sorted first by due date, then by priority, then
+	# alphanumerically.
 	due_dates=$(grep -oh 'due:[[:graph:]]*' "${file_todo}" | sort -u)
 	if [ -n "${due_dates}" ] ; then
 		for x in ${due_dates} ; do
@@ -200,6 +221,7 @@ today() {
 			fi
 		done
 	fi
+	# List tasks due today sorted first by priority, then alphanumerically.
 	due_today=$(grep -c "due:${date_today}" "${file_todo}")
 	if [ "${due_today}" -gt 0 ] ; then
 		n=$((n+1))
@@ -232,7 +254,7 @@ while getopts bd:r:t:p:q arg ; do
 		*) usage
 	esac
 done
-shift $((OPTIND - 1))
+shift $((OPTIND - 1)) # remove flags from indexing
 
 case $1 in
 	a*) append "$@" ;;
