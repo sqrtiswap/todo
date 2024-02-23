@@ -172,10 +172,12 @@ list_today() {
 	# alphanumerically.
 	due_dates=$(grep -oh 'due:[[:graph:]]*' "${file_todo}" | sort -u)
 	if [ -n "${due_dates}" ] ; then
+		d=0
 		for x in ${due_dates} ; do
 			if expr "$x" \< "due:$date_today" > /dev/null ; then
-				n=$((n+1))
-				[ "$n" -eq 1 ] && printf "%s\n" "----> Due urgently/overdue"
+				[ "$d" -eq 0 ] && printf "%s\n" "----> Due urgently/overdue"
+				count_x=$(grep -c "$x" "${file_todo}")
+				d=$((d+count_x))
 				list_tasks "" "${x}" | grep -i "$2"
 			fi
 		done
@@ -183,10 +185,10 @@ list_today() {
 	# List tasks due today sorted first by priority, then alphanumerically.
 	due_today=$(grep -c "due:${date_today}" "${file_todo}")
 	if [ "${due_today}" -gt 0 ] ; then
-		n=$((n+1))
 		printf "%s\n" "----> Due today, $(date '+%d %B %Y')"
 		list_tasks "" "due:${date_today}" | grep -i "$2"
 	fi
+	n=$((d+due_today))
 	if [ "$n" -eq 0 ] ; then
 		printf "%s\n" "Nothing due today! ;)"
 	fi
