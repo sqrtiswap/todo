@@ -41,7 +41,7 @@ check_due_dates() {
 }
 
 show_tasks() {
-	due_dates=$(grep "$1" "$TODODIR"/todo.txt | grep -oh 'due:[[:graph:]]*' | sort -u)
+	due_dates=$(grep -i "$1" "$TODODIR"/todo.txt 2> /dev/null | grep -oh 'due:[[:graph:]]*' | sort -u)
 	if [ -n "${due_dates}" ] ; then
 		check_due_dates
 		if [ "$n" -eq 1 ] ; then
@@ -50,7 +50,7 @@ show_tasks() {
 		fi
 	fi
 
-	due_dates=$(grep "$1" "$WORKTODODIR"/todo.txt | grep -oh 'due:[[:graph:]]*' | sort -u)
+	due_dates=$(grep -i "$1" "$WORKTODODIR"/todo.txt 2> /dev/null | grep -oh 'due:[[:graph:]]*' | sort -u)
 	if [ -n "${due_dates}" ] ; then
 		check_due_dates
 		if [ "$n" -eq 1 ] ; then
